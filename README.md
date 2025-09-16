@@ -1,108 +1,110 @@
-# Poker Tracker Desktop App
+# PokerTracker
 
-A desktop application built with Electron and React for tracking poker sessions and analyzing performance over time.
+A modern web app for tracking live poker sessions. Log sessions, locations, stakes, and notes; visualize winnings and hourly rate; and analyze results with flexible filters and a calendar view.
 
 ## Features
 
-- 🔐 **Google OAuth Authentication** - Secure login with Google account
-- 📊 **Interactive Dashboard** - Visual charts showing winnings over time
-- 📈 **Performance Analytics** - Track win rate, total hours, and session statistics
-- 💾 **Local Data Storage** - All data stored securely on your device
-- 🎯 **Session Management** - Add, edit, and delete poker sessions
-- 📱 **Responsive Design** - Beautiful UI with Tailwind CSS
+- 🔐 Email/password authentication (JWT)
+- 📊 Interactive dashboard with winnings-over-time chart
+- 📈 Performance analytics: total winnings, hours, hourly rate, best/worst sessions
+- 🗂️ Flexible filters: location, variation, blinds/stakes, location type, date range
+- 🗓️ Calendar to view and manage sessions by date
+- ✉️ Contact Support modal that emails feedback to the maintainer
+- ⚡ Deployed as a full-stack app on Vercel (React frontend + Node/Express API)
+
+## Stack
+
+- React, Tailwind CSS, Recharts, Lucide React
+- Node/Express, PostgreSQL (e.g. Neon), JWT auth
+- Vercel (static frontend + serverless API functions)
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
-- Yarn package manager
-- Google Cloud Console account (for OAuth setup)
+- Node.js 16+
+- A PostgreSQL database (e.g., Neon)
+- Vercel account (for hosting)
 
-## Setup Instructions
+## Environment Variables
 
-### 1. Install Dependencies
+Set these in Vercel Project Settings (Production/Preview/Development), and locally in a `.env` file if running the server yourself:
 
-```bash
-yarn install
-```
+- `DATABASE_URL` – Postgres connection string
+- `JWT_SECRET` – long random secret for JWT signing
+- `SMTP_HOST` – SMTP host for support emails
+- `SMTP_PORT` – SMTP port (587 or 465)
+- `SMTP_SECURE` – `true` for 465, otherwise `false`
+- `SMTP_USER` – SMTP username
+- `SMTP_PASS` – SMTP password
+- `FROM_EMAIL` – From address for emails (e.g., `no-reply@yourdomain`)
+- `SUPPORT_EMAIL` – Destination for support emails (default: owner’s email)
+- `REACT_APP_API_URL` – Optional. In production leave unset (frontend uses `/api`). In local dev you can leave unset to default to `http://localhost:5000/api`.
 
-### 2. Google OAuth Setup
+## Development
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Enable the Google+ API
-4. Create OAuth 2.0 credentials
-5. Add `http://localhost:3000` to authorized origins
-6. Copy your Client ID
-7. Update `src/services/auth.js` with your Client ID:
-
-```javascript
-const GOOGLE_CLIENT_ID = 'your-actual-client-id.apps.googleusercontent.com';
-```
-
-### 3. Development
-
-Run the development server:
+Run the API and frontend locally (two terminals):
 
 ```bash
-yarn dev
+# Terminal 1 – API
+node server.js
+
+# Terminal 2 – Frontend (CRA dev server)
+PORT=3000 npm start
 ```
 
-This will start both the React development server and Electron in development mode.
+By default the frontend will point to `http://localhost:5000/api` in development unless `REACT_APP_API_URL` is set.
 
-### 4. Production Build
-
-Build the application:
+## Build
 
 ```bash
-yarn build
-yarn electron-pack
+npm run build
 ```
+This produces a production build of the React app in `build/`.
+
+## Deploy (Vercel)
+
+This repo contains a `vercel.json` that:
+- Builds `server.js` with `@vercel/node` (served under `/api/*`)
+- Builds the CRA frontend with `@vercel/static-build` (output `build/`)
+- Routes `/api/*` to the server, everything else to the frontend
+
+Steps:
+1. Push the repo to GitHub.
+2. Import the repo into Vercel (New Project → Import Git Repository).
+3. Set environment variables listed above.
+4. Deploy. The app will be available at your Vercel domain.
 
 ## Project Structure
 
 ```
-poker-tracker/
+pokertracker/
 ├── public/
-│   ├── electron.js          # Electron main process
-│   └── index.html           # HTML template
+│   └── index.html            # HTML template
 ├── src/
 │   ├── components/
-│   │   ├── Dashboard.js     # Main dashboard component
-│   │   ├── LoginPage.js     # Authentication page
-│   │   ├── SessionModal.js  # Add/edit session modal
-│   │   └── SessionList.js   # Recent sessions list
+│   │   ├── Dashboard.js      # Dashboard + filters + chart
+│   │   ├── Calendar.js       # Calendar view / session mgmt
+│   │   ├── SessionPanel.js   # Add/Edit session panel
+│   │   ├── SessionList.js    # Recent sessions list
+│   │   ├── AuthForm.js       # Login/Register form
+│   │   └── SupportModal.js   # Contact Support modal
 │   ├── services/
-│   │   ├── auth.js          # Google OAuth service
-│   │   └── storage.js       # Local data storage
-│   ├── App.js               # Main React component
-│   ├── App.css              # App styles
-│   ├── index.js             # React entry point
-│   └── index.css            # Global styles
+│   │   └── api.js            # API client
+│   ├── index.js              # React entry
+│   └── index.css             # Global styles
+├── server.js                 # Express API (Postgres, auth, sessions, support)
+├── vercel.json               # Vercel build & routing
 ├── package.json
-├── tailwind.config.js
 └── README.md
 ```
 
 ## Usage
 
-1. **Sign In**: Use your Google account to authenticate
-2. **Add Sessions**: Click "New Session" to record poker sessions
-3. **View Analytics**: Dashboard shows winnings over time and statistics
-4. **Track Performance**: Monitor win rate, total hours, and session history
-
-## Data Storage
-
-All data is stored locally on your device using localStorage. No data is sent to external servers except for Google authentication.
-
-## Technologies Used
-
-- **Electron** - Desktop app framework
-- **React** - UI library
-- **Tailwind CSS** - Styling
-- **Recharts** - Data visualization
-- **Google OAuth** - Authentication
-- **Lucide React** - Icons
+1. Sign in (or register) with email/password.
+2. Add new sessions (date, location, variation, blinds, amounts, duration, notes).
+3. View analytics on the dashboard; filter by location, variation, blinds, location type, and date range.
+4. Use the Calendar to manage sessions by date.
+5. Send feedback from “Contact Support” (sends email to the maintainer).
 
 ## License
 
-MIT License
+MIT
