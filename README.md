@@ -10,3 +10,5 @@ Key highlights:
 - Email feedback to the maintainer from within the app
 
 Tech stack: React (Tailwind CSS, Recharts), Node/Express API, PostgreSQL, JWT auth, deployed on Vercel.
+
+> Most poker trackers look ugly as shit and I don't like paying for garbage software, so I built my own.
