@@ -1,14 +1,7 @@
 # PokerTracker
 
-PokerTracker is a modern web application for logging and analyzing live poker sessions. It lets you record session details (date, location, variation, blinds/stakes, buy-in, cash-out, duration, notes) and instantly see your performance through a clean dashboard and charts. A built‑in calendar view makes it easy to review or edit sessions by day, and flexible filters help you slice results by location, game type, stakes, location type, and date range. You can also send feedback directly from the app via the Contact Support button.
+PokerTracker is a clean, fast web app for logging and analyzing live poker sessions. Record your session details (date, location, variation, blinds, buy‑in, cash‑out, duration, notes) and instantly see how you’re doing with a simple dashboard, chart, and calendar. Filters make it easy to slice results by location, game type, stakes, location type, and date range. There’s also a Contact Support button to send feedback straight to the maintainer.
 
-Key highlights:
-- Track winnings, total hours, sessions played, and hourly rate
-- Visualize results over time and identify best/worst sessions
-- Filter by location, variation, blinds/stakes, location type, and custom date ranges
-- Manage sessions from a monthly calendar
-- Email feedback to the maintainer from within the app
+Check it out now at https://www.freepokertracker.com
 
-Tech stack: React (Tailwind CSS, Recharts), Node/Express API, PostgreSQL, JWT auth, deployed on Vercel.
-
-> Most poker trackers look ugly as shit and I don't like paying for garbage software, so I built my own.
+Tech stack: React, Tailwind CSS, Recharts, Node/Express, PostgreSQL, JWT auth, deployed on Vercel.
