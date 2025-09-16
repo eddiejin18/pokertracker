@@ -1,0 +1,82 @@
+{
+  "name": "poker-tracker",
+  "version": "1.0.0",
+  "description": "Desktop poker tracker with Google authentication",
+  "main": "public/electron.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron-dev": "ELECTRON_IS_DEV=true electron .",
+    "dev": "concurrently \"npm run server\" \"BROWSER=none PORT=3000 npm start\"",
+    "dev-electron": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "server": "node server.js",
+    "dev-frontend": "npm start",
+    "electron-pack": "electron-builder",
+    "preelectron-pack": "npm run build",
+    "vercel-build": "npm run build"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "electron": "^27.0.0",
+    "electron-is-dev": "^2.0.0",
+    "recharts": "^2.8.0",
+    "lucide-react": "^0.292.0",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "pg": "^8.11.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "nodemailer": "^6.9.8"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.4",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^4.9.5",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "appId": "com.pokertracker.app",
+    "productName": "Poker Tracker",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "public/electron.js",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.games"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
