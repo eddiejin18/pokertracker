@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import ApiService from './services/api';
 import { ToastProvider } from './components/ToastProvider';
 import { ThemeProvider } from './components/ThemeProvider';
@@ -107,6 +108,7 @@ function App() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <Dashboard user={user} onSignOut={handleSignOut} />
         </div>
+        <Analytics />
       </ToastProvider>
     </ThemeProvider>
   );
