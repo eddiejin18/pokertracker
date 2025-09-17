@@ -10,6 +10,7 @@ const SupportModal = ({ isOpen, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const toast = useToast();
+  const [isClosing, setIsClosing] = useState(false);
 
   if (!isOpen) return null;
 
@@ -22,7 +23,7 @@ const SupportModal = ({ isOpen, onClose }) => {
       toast.show('Thanks! Your message has been sent.', { type: 'success' });
       setSubject('');
       setMessage('');
-      onClose();
+      handleClose();
     } catch (err) {
       const msg = err.message || 'Failed to send message.';
       setFeedback({ ok: false, text: msg });
@@ -32,16 +33,24 @@ const SupportModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 200);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onMouseDown={onClose}>
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b">
+    <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity duration-200 ${isClosing ? 'opacity-0' : 'opacity-100'}`} onMouseDown={handleClose}>
+      <div className={`bg-white dark:bg-black rounded-xl shadow-2xl w-full max-w-lg border border-black/10 dark:border-white/30 transition-all duration-200 ${isClosing ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`} onMouseDown={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-black/10 dark:border-white/30">
           <h3 className="text-lg font-semibold text-black dark:text-white flex items-center"><Mail className="h-4 w-4 mr-2"/>Contact Support</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5"/></button>
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5"/></button>
         </div>
         <form onSubmit={submit} className="p-4 space-y-4">
           {feedback && (
-            <div className={`p-3 rounded-md border ${feedback.ok ? 'bg-green-50 border-green-600 text-green-700' : 'bg-red-50 border-red-600 text-red-700'}`}>
+            <div className={`p-3 rounded-md border ${feedback.ok ? 'bg-green-50 dark:bg-green-900/20 border-green-600 dark:border-green-800 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 border-red-600 dark:border-red-800 text-red-700 dark:text-red-400'}`}>
               {feedback.text}
             </div>
           )}

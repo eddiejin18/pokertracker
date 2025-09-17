@@ -40,12 +40,12 @@ function App() {
     checkAuth();
   }, []);
 
-  const handleLogin = async (email, password) => {
+  const handleLogin = async (email, password, rememberMe) => {
     try {
       setIsLoading(true);
       setError('');
       
-      const data = await ApiService.login(email, password);
+      const data = await ApiService.login(email, password, rememberMe);
       setUser(data.user);
       setIsAuthenticated(true);
     } catch (error) {
@@ -81,7 +81,7 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <LoadingDots />
       </div>
     );

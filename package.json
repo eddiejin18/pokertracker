@@ -2,6 +2,7 @@
   "name": "poker-tracker",
   "version": "1.0.0",
   "description": "Desktop poker tracker with Google authentication",
+  "license": "MIT",
   "main": "public/electron.js",
   "homepage": "./",
   "scripts": {

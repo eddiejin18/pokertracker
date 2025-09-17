@@ -5,15 +5,22 @@ const FALLBACKS = process.env.NODE_ENV === 'development'
 
 class ApiService {
   constructor() {
-    this.token = localStorage.getItem('pokerTracker_token');
+    this.token = localStorage.getItem('pokerTracker_token') || sessionStorage.getItem('pokerTracker_token');
   }
 
-  setToken(token) {
+  setToken(token, persist = 'local') {
     this.token = token;
     if (token) {
-      localStorage.setItem('pokerTracker_token', token);
+      if (persist === 'session') {
+        sessionStorage.setItem('pokerTracker_token', token);
+        localStorage.removeItem('pokerTracker_token');
+      } else {
+        localStorage.setItem('pokerTracker_token', token);
+        sessionStorage.removeItem('pokerTracker_token');
+      }
     } else {
       localStorage.removeItem('pokerTracker_token');
+      sessionStorage.removeItem('pokerTracker_token');
     }
   }
 
@@ -68,14 +75,14 @@ class ApiService {
     return data;
   }
 
-  async login(email, password) {
+  async login(email, password, rememberMe = true) {
     const data = await this.request('/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
     
     if (data.token) {
-      this.setToken(data.token);
+      this.setToken(data.token, rememberMe ? 'local' : 'session');
     }
     
     return data;
