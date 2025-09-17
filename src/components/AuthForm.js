@@ -59,6 +59,9 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error }) => {
             <p className="text-gray-600 dark:text-gray-300 text-sm">
               {isLogin ? 'Sign in to your account' : 'Create your account'}
             </p>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              A modern, simple, and free interface to track your poker sessions and profit.
+            </p>
           </div>
 
           {error && (
