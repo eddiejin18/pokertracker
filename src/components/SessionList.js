@@ -57,12 +57,12 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession }) => {
     const display = isLong && !isExpanded ? text.slice(0, limit) + '…' : text;
     return (
       <div className="mt-2">
-        <p className="text-sm text-gray-500 inline italic">"{display}"</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 inline italic">"{display}"</p>
         {isLong && (
           <button
             type="button"
             onClick={() => toggleNotes(session.id)}
-            className="ml-2 text-xs underline text-gray-500 hover:text-gray-700"
+            className="ml-2 text-xs underline text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           >
             {isExpanded ? 'View less' : 'View more'}
           </button>
@@ -75,8 +75,8 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession }) => {
     return (
       <div className="text-center py-8">
         <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <p className="text-gray-500">No sessions yet</p>
-        <p className="text-sm text-gray-400">Add your first session to get started</p>
+        <p className="text-gray-500 dark:text-gray-300">No sessions yet</p>
+        <p className="text-sm text-gray-400 dark:text-gray-400">Add your first session to get started</p>
       </div>
     );
   }
@@ -86,7 +86,7 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession }) => {
       {sessions.map((session) => (
         <div
           key={session.id}
-          className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+          className="bg-gray-50 dark:bg-black rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-neutral-900 transition-colors border border-black/10 dark:border-white/20"
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -97,7 +97,7 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession }) => {
                   }`}>
                     {formatCurrency(session.winnings)}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 dark:text-gray-300">
                     {session.game_type}
                   </span>
                 </div>
@@ -119,7 +119,7 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession }) => {
                 </div>
               </div>
               
-              <div className="space-y-1 text-sm text-gray-600">
+              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-3 w-3" />
                   <span>{formatDate(session.timestamp)}</span>
@@ -154,13 +154,13 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession }) => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg border border-black max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-black mb-4">Delete Session</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete this session? This action cannot be undone.</p>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-black dark:border-white/10 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Delete Session</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to delete this session? This action cannot be undone.</p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 border border-black text-black rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex-1 px-4 py-2 border border-black dark:border-white/10 text-black dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>

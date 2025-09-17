@@ -95,6 +95,21 @@ app.post('/api/support', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Subject and message are required' });
     }
 
+    // Check if SMTP is configured
+    if (!process.env.SMTP_HOST) {
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(500).json({ error: 'Email service not configured' });
+      } else {
+        // In development, allow testing without SMTP configuration
+        console.log('[DEV] Support message (no SMTP configured):', {
+          fromUser: { id: req.user.userId, email: req.user.email },
+          subject,
+          message
+        });
+        return res.json({ message: 'Feedback sent (dev noop)' });
+      }
+    }
+
     // Configure transporter via SMTP env vars
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,

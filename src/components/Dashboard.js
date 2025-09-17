@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTheme } from './ThemeProvider';
 import { 
   LogOut, 
   TrendingUp, 
@@ -16,10 +17,12 @@ import Calendar from './Calendar';
 import SessionList from './SessionList';
 import SessionPanel from './SessionPanel';
 import LoadingDots from './LoadingDots';
+import ThemeToggle from './ThemeToggle';
 import SupportModal from './SupportModal';
 
 const Dashboard = ({ user, onSignOut }) => {
   const [stats, setStats] = useState(null);
+  const { theme } = useTheme();
   const [chartData, setChartData] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1M');
   const [recentSessions, setRecentSessions] = useState([]);
@@ -321,54 +324,56 @@ const Dashboard = ({ user, onSignOut }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-black shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/70 dark:bg-black/60 backdrop-blur border-b border-black/5 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 bg-black rounded-full flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-white" />
+              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-black/10 dark:border-white/10 bg-white dark:bg-white">
+                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-black">Poker Tracker</h1>
-                <p className="text-sm text-gray-600">Welcome back, {user?.name}</p>
+                <h1 className="text-2xl font-bold text-black dark:text-white">Poker Tracker</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Welcome back, {user?.name}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex border border-black rounded-lg p-1">
+              <div className="relative inline-flex items-center border border-black/10 dark:border-white/10 rounded-lg p-1">
+                {/* Sliding highlight */}
+                <div
+                  className={`absolute top-1 bottom-1 left-1 w-1/2 rounded-md transition-transform duration-300 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}
+                  style={{ transform: activeView === 'calendar' ? 'translateX(100%)' : 'translateX(0%)' }}
+                />
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    activeView === 'dashboard'
-                      ? 'bg-black text-white'
-                      : 'text-black hover:bg-gray-100'
+                  className={`relative z-10 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
+                    activeView === 'dashboard' ? (theme === 'dark' ? 'text-black' : 'text-white') : 'text-black dark:text-white'
                   }`}
                 >
-                  <Home className="h-4 w-4 inline mr-1" />
+                  <Home className="h-4 w-4 mr-1 align-middle" />
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    activeView === 'calendar'
-                      ? 'bg-black text-white'
-                      : 'text-black hover:bg-gray-100'
+                  className={`relative z-10 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
+                    activeView === 'calendar' ? (theme === 'dark' ? 'text-black' : 'text-white') : 'text-black dark:text-white'
                   }`}
                 >
-                  <CalendarIcon className="h-4 w-4 inline mr-1" />
+                  <CalendarIcon className="h-4 w-4 mr-1 align-middle" />
                   Sessions
                 </button>
               </div>
+              <ThemeToggle />
               <button
                 onClick={() => setIsSupportOpen(true)}
-                className="px-3 py-2 border border-black rounded-lg text-black hover:bg-gray-100"
+                className="btn"
               >
                 Contact Support
               </button>
               <button
                 onClick={onSignOut}
-                className="flex items-center px-4 py-2 text-black hover:text-gray-600 transition-colors border border-black rounded-lg"
+                className="btn"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
@@ -378,24 +383,24 @@ const Dashboard = ({ user, onSignOut }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black dark:text-white">
         {activeView === 'dashboard' && (
           <>
             {/* Filters */}
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-black">Filters</h3>
+              <h3 className="text-sm font-semibold text-black dark:text-white">Filters</h3>
               <button
                 onClick={() => setFilters(defaultFilters)}
-                className="text-xs px-3 py-1 border border-black rounded-md hover:bg-gray-100"
+                className="text-xs px-3 py-1 border border-black/10 dark:border-white/10 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 Clear all
               </button>
             </div>
             <div className="mb-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <div>
-                <div className="text-xs text-gray-600 mb-1">Location</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Location</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black rounded-md px-2 pr-9 py-1.5 text-sm w-full" value={filters.location} onChange={e=>setFilters(prev=>({...prev, location:e.target.value}))}>
+                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.location} onChange={e=>setFilters(prev=>({...prev, location:e.target.value}))}>
                     <option value="ALL">All</option>
                     {[...new Set((locationData||[]).map(l=>l.location))].map(loc=>(<option key={loc} value={loc}>{loc}</option>))}
                   </select>
@@ -403,9 +408,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 mb-1">Variation</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Variation</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black rounded-md px-2 pr-9 py-1.5 text-sm w-full" value={filters.gameType} onChange={e=>setFilters(prev=>({...prev, gameType:e.target.value}))}>
+                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.gameType} onChange={e=>setFilters(prev=>({...prev, gameType:e.target.value}))}>
                     <option value="ALL">All</option>
                     {[...new Set((gameTypeData||[]).map(g=>g.gameType))].map(gt=>(<option key={gt} value={gt}>{gt}</option>))}
                   </select>
@@ -413,9 +418,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 mb-1">Blinds/Stakes</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Blinds/Stakes</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black rounded-md px-2 pr-9 py-1.5 text-sm w-full" value={filters.blinds} onChange={e=>setFilters(prev=>({...prev, blinds:e.target.value}))}>
+                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.blinds} onChange={e=>setFilters(prev=>({...prev, blinds:e.target.value}))}>
                     <option value="ALL">All</option>
                     {blindsOptions.map(b => (<option key={b} value={b}>{b}</option>))}
                   </select>
@@ -423,9 +428,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 mb-1">Location Type</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Location Type</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black rounded-md px-2 pr-9 py-1.5 text-sm w-full" value={filters.locationType} onChange={e=>setFilters(prev=>({...prev, locationType:e.target.value}))}>
+                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.locationType} onChange={e=>setFilters(prev=>({...prev, locationType:e.target.value}))}>
                     <option value="ALL">All</option>
                     <option value="home">Home</option>
                     <option value="casino">Casino</option>
@@ -434,12 +439,12 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 mb-1">Start Date</div>
-                <input type="date" className="border border-black rounded-md px-2 py-1.5 text-sm w-full" value={filters.startDate} onChange={e=>setFilters(prev=>({...prev, startDate:e.target.value}))} />
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Start Date</div>
+                <input type="date" className="border border-black/10 dark:border-white/20 rounded-md px-2 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.startDate} onChange={e=>setFilters(prev=>({...prev, startDate:e.target.value}))} />
               </div>
               <div>
-                <div className="text-xs text-gray-600 mb-1">End Date</div>
-                <input type="date" className="border border-black rounded-md px-2 py-1.5 text-sm w-full" value={filters.endDate} onChange={e=>setFilters(prev=>({...prev, endDate:e.target.value}))} />
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">End Date</div>
+                <input type="date" className="border border-black/10 dark:border-white/20 rounded-md px-2 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.endDate} onChange={e=>setFilters(prev=>({...prev, endDate:e.target.value}))} />
               </div>
             </div>
           </>
@@ -450,55 +455,35 @@ const Dashboard = ({ user, onSignOut }) => {
           <>
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white border border-black p-6 card-hover">
-            <div className="flex items-center">
-              <div className="p-2 bg-black rounded-lg">
-                <DollarSign className="h-6 w-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Winnings</p>
-                <p className={`text-2xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-black' : 'text-gray-600'}`}>
-                  {formatCurrency(safeStats.totalWinnings)}
-                </p>
-              </div>
+          <div className="card p-6">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Winnings</p>
+              <p className={`text-2xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+                {formatCurrency(safeStats.totalWinnings)}
+              </p>
             </div>
           </div>
 
-          <div className="bg-white border border-black p-6 card-hover">
-            <div className="flex items-center">
-              <div className="p-2 bg-black rounded-lg">
-                <Target className="h-6 w-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Sessions Played</p>
-                <p className="text-2xl font-bold text-black">{safeStats.totalSessions}</p>
-              </div>
+          <div className="card p-6">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sessions Played</p>
+              <p className="text-2xl font-bold text-black dark:text-white">{safeStats.totalSessions}</p>
             </div>
           </div>
 
-          <div className="bg-white border border-black p-6 card-hover">
-            <div className="flex items-center">
-              <div className="p-2 bg-black rounded-lg">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Hours</p>
-                <p className="text-2xl font-bold text-black">{formatDuration(safeStats.totalHours)}</p>
-              </div>
+          <div className="card p-6">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hours</p>
+              <p className="text-2xl font-bold text-black dark:text-white">{formatDuration(safeStats.totalHours)}</p>
             </div>
           </div>
 
-          <div className="bg-white border border-black p-6 card-hover">
-            <div className="flex items-center">
-              <div className="p-2 bg-black rounded-lg">
-                <BarChart3 className="h-6 w-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Hourly Profit</p>
-                <p className={`text-2xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-black' : 'text-gray-600'}`}>
-                  {formatCurrency(safeStats.hourlyProfit)}/hr
-                </p>
-              </div>
+          <div className="card p-6">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Hourly Profit</p>
+              <p className={`text-2xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+                {formatCurrency(safeStats.hourlyProfit)}/hr
+              </p>
             </div>
           </div>
         </div>
@@ -506,16 +491,16 @@ const Dashboard = ({ user, onSignOut }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Winnings Chart */}
           <div className="lg:col-span-2">
-            <div className="bg-white border border-black p-6">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-black">Winnings Over Time</h3>
+                <h3 className="text-lg font-semibold text-black dark:text-white">Winnings Over Time</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setSelectedPeriod('1W')}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '1W'
-                        ? 'bg-black text-white'
-                        : 'bg-white text-black border border-black hover:bg-gray-100'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     1W
@@ -524,8 +509,8 @@ const Dashboard = ({ user, onSignOut }) => {
                     onClick={() => setSelectedPeriod('1M')}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '1M'
-                        ? 'bg-black text-white'
-                        : 'bg-white text-black border border-black hover:bg-gray-100'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     1M
@@ -534,8 +519,8 @@ const Dashboard = ({ user, onSignOut }) => {
                     onClick={() => setSelectedPeriod('3M')}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '3M'
-                        ? 'bg-black text-white'
-                        : 'bg-white text-black border border-black hover:bg-gray-100'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     3M
@@ -544,8 +529,8 @@ const Dashboard = ({ user, onSignOut }) => {
                     onClick={() => setSelectedPeriod('1Y')}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '1Y'
-                        ? 'bg-black text-white'
-                        : 'bg-white text-black border border-black hover:bg-gray-100'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     1Y
@@ -554,8 +539,8 @@ const Dashboard = ({ user, onSignOut }) => {
                     onClick={() => setSelectedPeriod('ALL')}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === 'ALL'
-                        ? 'bg-black text-white'
-                        : 'bg-white text-black border border-black hover:bg-gray-100'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     ALL
@@ -566,23 +551,23 @@ const Dashboard = ({ user, onSignOut }) => {
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
                     <XAxis 
                       dataKey="period" 
-                      stroke="#666"
+                      stroke={theme === 'dark' ? '#9ca3af' : '#666'}
                       fontSize={12}
                     />
                     <YAxis 
-                      stroke="#666"
+                      stroke={theme === 'dark' ? '#9ca3af' : '#666'}
                       fontSize={12}
                       tickFormatter={(value) => `$${value}`}
                     />
                     <Tooltip 
                       formatter={(value) => [formatCurrency(value), 'Winnings']}
-                      labelStyle={{ color: '#374151' }}
+                      labelStyle={{ color: theme === 'dark' ? '#e5e7eb' : '#374151' }}
                       contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
+                        backgroundColor: theme === 'dark' ? '#000000' : 'white',
+                        border: theme === 'dark' ? '1px solid #1f2937' : '1px solid #e5e7eb',
                         borderRadius: '8px',
                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                       }}
@@ -590,10 +575,10 @@ const Dashboard = ({ user, onSignOut }) => {
                     <Line 
                       type="monotone" 
                       dataKey="winnings" 
-                      stroke="#000000" 
+                      stroke={theme === 'dark' ? '#ffffff' : '#000000'} 
                       strokeWidth={3}
-                      dot={{ fill: '#000000', strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, stroke: '#000000', strokeWidth: 2 }}
+                      dot={{ fill: theme === 'dark' ? '#ffffff' : '#000000', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: theme === 'dark' ? '#ffffff' : '#000000', strokeWidth: 2 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -603,8 +588,8 @@ const Dashboard = ({ user, onSignOut }) => {
 
           {/* Recent Sessions */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-black p-6">
-              <h3 className="text-lg font-semibold text-black mb-4">Recent Sessions</h3>
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
               <SessionList 
                 sessions={recentSessions} 
                 onSessionUpdated={loadData}

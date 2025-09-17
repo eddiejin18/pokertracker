@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ApiService from './services/api';
+import { ToastProvider } from './components/ToastProvider';
+import { ThemeProvider } from './components/ThemeProvider';
 import AuthForm from './components/AuthForm';
 import Dashboard from './components/Dashboard';
 import './App.css';
@@ -86,19 +88,27 @@ function App() {
 
   if (!isAuthenticated) {
     return (
-      <AuthForm 
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-        isLoading={isLoading}
-        error={error}
-      />
+      <ThemeProvider>
+        <ToastProvider>
+          <AuthForm 
+            onLogin={handleLogin}
+            onRegister={handleRegister}
+            isLoading={isLoading}
+            error={error}
+          />
+        </ToastProvider>
+      </ThemeProvider>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Dashboard user={user} onSignOut={handleSignOut} />
-    </div>
+    <ThemeProvider>
+      <ToastProvider>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Dashboard user={user} onSignOut={handleSignOut} />
+        </div>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

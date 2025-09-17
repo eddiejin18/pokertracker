@@ -25,6 +25,73 @@ body {
   background-color: #f8fafc;
 }
 
+/* Dark mode global background */
+.dark body {
+  background-color: #000000; /* true black in dark mode */
+}
+
+/* Ensure all root elements are black in dark mode */
+.dark {
+  background-color: #000000;
+}
+
+.dark #root {
+  background-color: #000000;
+}
+
+/* Make date input calendar icon visible in dark mode */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2);
+  opacity: 0.9;
+}
+
+/* Remove blue outlines and focus rings */
+* {
+  outline: none !important;
+}
+
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove Tailwind focus rings */
+.focus\:ring-0:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+/* Remove focus rings from all interactive elements */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[tabindex]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Component primitives */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors border border-black/10 dark:border-white/30 bg-white text-black hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-neutral-900 focus:outline-none;
+}
+.btn-primary {
+  @apply border-transparent bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-200;
+}
+.btn-ghost {
+  @apply bg-transparent border-transparent hover:bg-gray-100 dark:hover:bg-gray-800;
+}
+.input {
+  @apply w-full px-3 py-2 rounded-lg border border-black/10 dark:border-white/30 bg-white text-black placeholder-gray-400 focus:outline-none dark:bg-black dark:text-white;
+}
+.card {
+  @apply rounded-xl border border-black/10 dark:border-white/30 bg-white dark:bg-black shadow-sm;
+}
+.muted {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
