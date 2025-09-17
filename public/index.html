@@ -24,12 +24,12 @@
     <title>Free Poker Tracker | Track Poker Winnings, Profit & Sessions</title>
     <style>
       /* Prevent initial white flash by honoring system dark preference before JS runs */
-      html, body, #root { background: #fff; }
+      html, body, #root { background: #fff !important; }
       @media (prefers-color-scheme: dark) {
-        html, body, #root { background: #000; }
+        html, body, #root { background: #000 !important; }
       }
       /* Also handle explicit dark class set by our script */
-      html.dark, html.dark body, html.dark #root { background:#000; }
+      html.dark, html.dark body, html.dark #root { background:#000 !important; }
     </style>
     <script>
       (function() {
@@ -38,7 +38,18 @@
           var stored = localStorage.getItem(KEY);
           var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
           var isDark = stored ? stored === 'dark' : prefersDark;
-          if (isDark) document.documentElement.classList.add('dark');
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.backgroundColor = '#000000';
+            if (document.body) document.body.style.backgroundColor = '#000000';
+            var root = document.getElementById('root');
+            if (root) root.style.backgroundColor = '#000000';
+          } else {
+            document.documentElement.style.backgroundColor = '#ffffff';
+            if (document.body) document.body.style.backgroundColor = '#ffffff';
+            var root2 = document.getElementById('root');
+            if (root2) root2.style.backgroundColor = '#ffffff';
+          }
         } catch (e) {}
       })();
     </script>

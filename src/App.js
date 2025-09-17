@@ -17,10 +17,8 @@ function App() {
   useEffect(() => {
     // Check if user is already authenticated
     const checkAuth = async () => {
-      const token = localStorage.getItem('pokerTracker_token');
-      const userData = localStorage.getItem('pokerTracker_user');
-      
-      if (token && userData) {
+      const userData = localStorage.getItem('pokerTracker_user') || sessionStorage.getItem('pokerTracker_user');
+      if (userData) {
         try {
           // Test if token is still valid by making a request
           await ApiService.getSessions();
@@ -31,9 +29,10 @@ function App() {
           console.log('Token expired, clearing auth data');
           localStorage.removeItem('pokerTracker_token');
           localStorage.removeItem('pokerTracker_user');
+          sessionStorage.removeItem('pokerTracker_token');
+          sessionStorage.removeItem('pokerTracker_user');
         }
       }
-      
       setIsLoading(false);
     };
 
@@ -48,6 +47,15 @@ function App() {
       const data = await ApiService.login(email, password, rememberMe);
       setUser(data.user);
       setIsAuthenticated(true);
+      // Persist user alongside token based on rememberMe
+      const userJson = JSON.stringify(data.user);
+      if (rememberMe) {
+        localStorage.setItem('pokerTracker_user', userJson);
+        sessionStorage.removeItem('pokerTracker_user');
+      } else {
+        sessionStorage.setItem('pokerTracker_user', userJson);
+        localStorage.removeItem('pokerTracker_user');
+      }
     } catch (error) {
       console.error('Login error:', error);
       // Surface server-provided messages (email not found vs incorrect password)
@@ -65,6 +73,9 @@ function App() {
       const data = await ApiService.register(email, password, name);
       setUser(data.user);
       setIsAuthenticated(true);
+      // Default to persistent on register
+      localStorage.setItem('pokerTracker_user', JSON.stringify(data.user));
+      sessionStorage.removeItem('pokerTracker_user');
     } catch (error) {
       console.error('Registration error:', error);
       setError(error.message || 'Registration failed. Please try again.');
@@ -77,6 +88,8 @@ function App() {
     ApiService.logout();
     setUser(null);
     setIsAuthenticated(false);
+    localStorage.removeItem('pokerTracker_user');
+    sessionStorage.removeItem('pokerTracker_user');
   };
 
   if (isLoading) {
