@@ -29,7 +29,8 @@ const Dashboard = ({ user, onSignOut }) => {
   const [activeView, setActiveView] = useState('dashboard');
   const [gameTypeData, setGameTypeData] = useState([]);
   const [locationData, setLocationData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [isEditPanelOpen, setIsEditPanelOpen] = useState(false);
   const [editingSession, setEditingSession] = useState(null);
@@ -51,7 +52,11 @@ const Dashboard = ({ user, onSignOut }) => {
 
   const loadData = async () => {
     try {
-      setIsLoading(true);
+      if (isInitialLoading) {
+        setIsInitialLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
       setError(null);
       
       let sessions = await ApiService.getSessions();
@@ -89,7 +94,10 @@ const Dashboard = ({ user, onSignOut }) => {
       console.error('Error loading data:', error);
       setError('Failed to load data. Please try again.');
     } finally {
-      setIsLoading(false);
+      if (isInitialLoading) {
+        setIsInitialLoading(false);
+      }
+      setIsRefreshing(false);
     }
   };
 
@@ -289,9 +297,9 @@ const Dashboard = ({ user, onSignOut }) => {
     return `${h}h ${m}m`;
   };
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <LoadingDots />
       </div>
     );
@@ -299,7 +307,7 @@ const Dashboard = ({ user, onSignOut }) => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button 
@@ -455,7 +463,7 @@ const Dashboard = ({ user, onSignOut }) => {
           <>
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="card p-6">
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Winnings</p>
               <p className={`text-2xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
@@ -464,21 +472,21 @@ const Dashboard = ({ user, onSignOut }) => {
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sessions Played</p>
               <p className="text-2xl font-bold text-black dark:text-white">{safeStats.totalSessions}</p>
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hours</p>
               <p className="text-2xl font-bold text-black dark:text-white">{formatDuration(safeStats.totalHours)}</p>
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Hourly Profit</p>
               <p className={`text-2xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
@@ -494,7 +502,10 @@ const Dashboard = ({ user, onSignOut }) => {
             <div className="card p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-black dark:text-white">Winnings Over Time</h3>
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2">
+                  {isRefreshing && (
+                    <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin text-black dark:text-white" />
+                  )}
                   <button
                     onClick={() => setSelectedPeriod('1W')}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
@@ -548,7 +559,7 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               
-              <div className="h-80">
+              <div className={`h-80 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
