@@ -10,7 +10,7 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error }) => {
     email: '',
     password: '',
     name: '',
-    rememberMe: false
+    rememberMe: true
   });
   const [showErrorToast, setShowErrorToast] = useState(false);
 
