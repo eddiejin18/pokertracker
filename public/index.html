@@ -23,6 +23,12 @@
     <link rel="manifest" href="/manifest.json" />
     <title>Free Poker Tracker | Track Poker Winnings, Profit & Sessions</title>
     <style>
+      /* Prevent initial white flash by honoring system dark preference before JS runs */
+      html, body, #root { background: #fff; }
+      @media (prefers-color-scheme: dark) {
+        html, body, #root { background: #000; }
+      }
+      /* Also handle explicit dark class set by our script */
       html.dark, html.dark body, html.dark #root { background:#000; }
     </style>
     <script>
