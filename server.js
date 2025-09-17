@@ -3,7 +3,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 require('dotenv').config();
 
 const app = express();
@@ -14,6 +14,9 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Middleware
 app.use(cors());
@@ -95,13 +98,13 @@ app.post('/api/support', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Subject and message are required' });
     }
 
-    // Check if SMTP is configured
-    if (!process.env.SMTP_HOST) {
+    // Check if Resend API key is configured
+    if (!process.env.RESEND_API_KEY) {
       if (process.env.NODE_ENV === 'production') {
         return res.status(500).json({ error: 'Email service not configured' });
       } else {
-        // In development, allow testing without SMTP configuration
-        console.log('[DEV] Support message (no SMTP configured):', {
+        // In development, allow testing without Resend configuration
+        console.log('[DEV] Support message (no Resend API key configured):', {
           fromUser: { id: req.user.userId, email: req.user.email },
           subject,
           message
@@ -109,17 +112,6 @@ app.post('/api/support', authenticateToken, async (req, res) => {
         return res.json({ message: 'Feedback sent (dev noop)' });
       }
     }
-
-    // Configure transporter via SMTP env vars
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: process.env.SMTP_USER && process.env.SMTP_PASS ? {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      } : undefined
-    });
 
     // Fetch user details to include name/email in the message
     let userDisplay = `User ID ${req.user.userId}`;
@@ -133,15 +125,40 @@ app.post('/api/support', authenticateToken, async (req, res) => {
     }
 
     const toEmail = process.env.SUPPORT_EMAIL || 'eddiejin18@gmail.com';
-    const info = await transporter.sendMail({
-      from: process.env.FROM_EMAIL || 'no-reply@pokertracker.app',
+    const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+    
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
       to: toEmail,
       replyTo: req.user.email, // allows you to reply directly to the user
       subject: `[PokerTracker Support] ${subject}`,
-      text: `From: ${userDisplay}\n\n${message}`
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">New Feedback Received</h2>
+          <p style="color: #374151; line-height: 1.6;">
+            <strong>From:</strong> ${userDisplay}<br/>
+            <strong>Email:</strong> <a href="mailto:${req.user.email}">${req.user.email}</a><br/>
+            <strong>Subject:</strong> ${subject}
+          </p>
+          <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px; margin: 16px 0;">
+            <p style="color: #374151; line-height: 1.6; margin: 0;">
+              ${message.replace(/\n/g, '<br/>')}
+            </p>
+          </div>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+          <p style="color: #6b7280; font-size: 0.875rem;">
+            This feedback was submitted through PokerTracker.
+          </p>
+        </div>
+      `,
     });
 
-    res.json({ message: 'Feedback sent', id: info.messageId });
+    if (error) {
+      console.error('Resend error:', error);
+      return res.status(500).json({ error: 'Failed to send feedback' });
+    }
+
+    res.json({ message: 'Feedback sent', id: data.id });
   } catch (error) {
     console.error('Support email error:', error);
     res.status(500).json({ error: 'Failed to send feedback' });

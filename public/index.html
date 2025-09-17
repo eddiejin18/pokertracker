@@ -22,6 +22,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="manifest" href="/manifest.json" />
     <title>Free Poker Tracker | Track Poker Winnings, Profit & Sessions</title>
+    <style>
+      html.dark, html.dark body, html.dark #root { background:#000; }
+    </style>
+    <script>
+      (function() {
+        try {
+          var KEY = 'pokerTracker_theme';
+          var stored = localStorage.getItem(KEY);
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = stored ? stored === 'dark' : prefersDark;
+          if (isDark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",

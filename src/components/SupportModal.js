@@ -48,27 +48,30 @@ const SupportModal = ({ isOpen, onClose }) => {
           <h3 className="text-lg font-semibold text-black dark:text-white flex items-center"><Mail className="h-4 w-4 mr-2"/>Contact Support</h3>
           <button onClick={handleClose} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5"/></button>
         </div>
-        <form onSubmit={submit} className="p-4 space-y-4">
-          {feedback && (
-            <div className={`p-3 rounded-md border ${feedback.ok ? 'bg-green-50 dark:bg-green-900/20 border-green-600 dark:border-green-800 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 border-red-600 dark:border-red-800 text-red-700 dark:text-red-400'}`}>
-              {feedback.text}
+          <form onSubmit={submit} className="p-4 space-y-4">
+            {feedback && (
+              <div className={`p-3 rounded-md border ${feedback.ok ? 'bg-green-50 dark:bg-green-900/20 border-green-600 dark:border-green-800 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 border-red-600 dark:border-red-800 text-red-700 dark:text-red-400'}`}>
+                {feedback.text}
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-black dark:text-white mb-1">Subject</label>
+              <input value={subject} onChange={(e)=>setSubject(e.target.value)} required className="input" placeholder="Brief summary"/>
             </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-black dark:text-white mb-1">Subject</label>
-            <input value={subject} onChange={(e)=>setSubject(e.target.value)} required className="input" placeholder="Brief summary"/>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-black dark:text-white mb-1">Message</label>
-            <textarea value={message} onChange={(e)=>setMessage(e.target.value)} required rows={5} className="input" placeholder="Please describe your issue or feedback"/>
-          </div>
-          <div className="flex justify-end space-x-2 pt-2">
-            <button type="button" onClick={onClose} className="btn">Close</button>
-            <button type="submit" disabled={isSubmitting} className="btn btn-primary disabled:opacity-50">
-              {isSubmitting ? <LoadingDots /> : 'Send'}
-            </button>
-          </div>
-        </form>
+            <div>
+              <label className="block text-sm font-medium text-black dark:text-white mb-1">Message</label>
+              <textarea value={message} onChange={(e)=>setMessage(e.target.value)} required rows={5} className="input" placeholder="Please describe your issue or feedback"/>
+            </div>
+            <div className="flex justify-end space-x-2 pt-2">
+              <button type="button" onClick={handleClose} className="btn">Close</button>
+              <button type="submit" disabled={isSubmitting} className="btn btn-primary disabled:opacity-50 flex items-center gap-2">
+                {isSubmitting && (
+                  <span className="inline-block h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                )}
+                <span>{isSubmitting ? 'Sending...' : 'Send'}</span>
+              </button>
+            </div>
+          </form>
       </div>
     </div>
   );
