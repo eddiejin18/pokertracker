@@ -121,12 +121,24 @@ app.post('/api/support', authenticateToken, async (req, res) => {
       } : undefined
     });
 
+    // Fetch user details to include name/email in the message
+    let userDisplay = `User ID ${req.user.userId}`;
+    try {
+      const { rows } = await pool.query('SELECT name, email FROM users WHERE id = $1', [req.user.userId]);
+      if (rows.length > 0) {
+        userDisplay = `${rows[0].name} <${rows[0].email}>`;
+      }
+    } catch (_) {
+      // non-fatal
+    }
+
     const toEmail = process.env.SUPPORT_EMAIL || 'eddiejin18@gmail.com';
     const info = await transporter.sendMail({
       from: process.env.FROM_EMAIL || 'no-reply@pokertracker.app',
       to: toEmail,
+      replyTo: req.user.email, // allows you to reply directly to the user
       subject: `[PokerTracker Support] ${subject}`,
-      text: `From user ${req.user.email} (id ${req.user.userId})\n\n${message}`
+      text: `From: ${userDisplay}\n\n${message}`
     });
 
     res.json({ message: 'Feedback sent', id: info.messageId });
