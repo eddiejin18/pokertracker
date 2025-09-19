@@ -5,6 +5,7 @@ import { ToastProvider } from './components/ToastProvider';
 import { ThemeProvider } from './components/ThemeProvider';
 import AuthForm from './components/AuthForm';
 import Dashboard from './components/Dashboard';
+import LandingPage from './components/LandingPage';
 import './App.css';
 import LoadingDots from './components/LoadingDots';
 
@@ -13,6 +14,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
+  const [showLandingPage, setShowLandingPage] = useState(true);
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -24,6 +26,7 @@ function App() {
           await ApiService.getSessions();
           setUser(JSON.parse(userData));
           setIsAuthenticated(true);
+          setShowLandingPage(false); // Skip landing page if already authenticated
         } catch (error) {
           // Token is invalid, clear it
           console.log('Token expired, clearing auth data');
@@ -88,8 +91,13 @@ function App() {
     ApiService.logout();
     setUser(null);
     setIsAuthenticated(false);
+    setShowLandingPage(true); // Show landing page after sign out
     localStorage.removeItem('pokerTracker_user');
     sessionStorage.removeItem('pokerTracker_user');
+  };
+
+  const handleGetStarted = () => {
+    setShowLandingPage(false);
   };
 
   if (isLoading) {
@@ -101,6 +109,14 @@ function App() {
   }
 
   if (!isAuthenticated) {
+    if (showLandingPage) {
+      return (
+        <ThemeProvider>
+          <LandingPage onGetStarted={handleGetStarted} />
+        </ThemeProvider>
+      );
+    }
+    
     return (
       <ThemeProvider>
         <ToastProvider>
