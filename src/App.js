@@ -110,11 +110,7 @@ function App() {
 
   if (!isAuthenticated) {
     if (showLandingPage) {
-      return (
-        <ThemeProvider>
-          <LandingPage onGetStarted={handleGetStarted} />
-        </ThemeProvider>
-      );
+      return <LandingPage onGetStarted={handleGetStarted} />;
     }
     
     return (
