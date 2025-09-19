@@ -242,6 +242,74 @@ const LandingPage = ({ onGetStarted }) => {
           </div>
         </div>
       </footer>
+      
+      {/* Hidden SEO Content */}
+      <div style={{ display: 'none' }}>
+        <h1>Free Poker Tracker App - Best Free Poker Tracker Download</h1>
+        <h2>Poker Tracker 4 Free Alternative - Poker Tracker App</h2>
+        <h3>Download Free Poker Tracker App - Best Poker Tracking Software</h3>
+        <p>
+          Looking for the best free poker tracker? Our free poker tracker app is better than Poker Tracker 4 free versions. 
+          Download our free poker tracker app today. This is the best free poker tracker available online. 
+          Get your free poker tracker download now. Our poker tracker app works better than Poker Tracker 4.
+          Free poker tracker app download available. Best free poker tracker for serious players.
+          Poker Tracker 4 free alternative that's actually free. Download free poker tracker app.
+          The best free poker tracker app for mobile and desktop. Free poker tracker download with no hidden costs.
+          Poker Tracker 4 free version alternative. Best free poker tracker app download. Poker tracker app that beats Poker Tracker 4.
+          Free poker tracker app download for Windows, Mac, and mobile. Best free poker tracker with advanced features.
+          Poker Tracker 4 free alternative with better interface. Download the best free poker tracker app today.
+          The best poker bankroll tracker for online poker players. Online poker tracker that works with all poker sites.
+          Free poker tracker download for bankroll management. Poker tracker pt4 alternative that's completely free.
+          Online poker tracker app for mobile and desktop. Poker tracker download free with no hidden costs.
+          Poker bankroll tracker that beats Poker Tracker PT4. Online poker tracking software for serious players.
+          Free poker bankroll tracker with advanced analytics. Poker tracker pt4 free alternative with better features.
+          Online poker tracker app download available. Poker tracker software that works better than PT4.
+          Poker bankroll management with our free poker tracker. Online poker tracker free download.
+        </p>
+        <div>
+          <span>free poker tracker app</span>
+          <span>free poker tracker download</span>
+          <span>best free poker tracker</span>
+          <span>poker tracker 4</span>
+          <span>poker tracker 4 free</span>
+          <span>poker tracker app</span>
+          <span>download free poker tracker app</span>
+          <span>best poker tracker app</span>
+          <span>poker tracker 4 alternative</span>
+          <span>free poker tracking software</span>
+          <span>poker tracker mobile app</span>
+          <span>poker tracker 4 free download</span>
+          <span>poker bankroll tracker</span>
+          <span>online poker tracker</span>
+          <span>poker tracker download</span>
+          <span>poker tracker pt4</span>
+          <span>poker tracker free</span>
+          <span>poker bankroll management</span>
+          <span>online poker tracking</span>
+          <span>poker tracker software</span>
+          <span>poker tracker pt4 alternative</span>
+          <span>free poker bankroll tracker</span>
+          <span>online poker tracker app</span>
+          <span>poker tracker download free</span>
+          <span>poker tracker pt4 free</span>
+        </div>
+        <ul>
+          <li>Free poker tracker app download</li>
+          <li>Best free poker tracker software</li>
+          <li>Poker Tracker 4 free alternative</li>
+          <li>Download poker tracker app</li>
+          <li>Free poker tracking app</li>
+          <li>Poker tracker 4 vs free tracker</li>
+          <li>Poker bankroll tracker free</li>
+          <li>Online poker tracker app</li>
+          <li>Poker tracker download free</li>
+          <li>Poker tracker pt4 alternative</li>
+          <li>Poker tracker free download</li>
+          <li>Online poker tracking software</li>
+          <li>Poker bankroll management tracker</li>
+          <li>Poker tracker pt4 free</li>
+        </ul>
+      </div>
       </div>
     </ThemeProvider>
   );

@@ -19,6 +19,50 @@
       "dest": "/server.js"
     },
     {
+      "src": "/free-poker-tracker-app",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/free-poker-tracker-download",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/best-free-poker-tracker",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-tracker-4",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-tracker-4-free",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-tracker-app",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-bankroll-tracker",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/online-poker-tracker",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-tracker-download",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-tracker-pt4",
+      "dest": "/build/index.html"
+    },
+    {
+      "src": "/poker-tracker-free",
+      "dest": "/build/index.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/build/$1"
     }

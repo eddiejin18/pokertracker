@@ -1,7 +1,17 @@
 User-agent: *
 Allow: /
-# Delay aggressive crawlers slightly
-Crawl-delay: 1
+
+# SEO Pages
+Allow: /free-poker-tracker-app
+Allow: /free-poker-tracker-download
+Allow: /best-free-poker-tracker
+Allow: /poker-tracker-4
+Allow: /poker-tracker-4-free
+Allow: /poker-tracker-app
+Allow: /poker-bankroll-tracker
+Allow: /online-poker-tracker
+Allow: /poker-tracker-download
+Allow: /poker-tracker-pt4
+Allow: /poker-tracker-free
+
 Sitemap: https://freepokertracker.com/sitemap.xml
-
-

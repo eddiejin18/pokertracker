@@ -6,6 +6,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 import AuthForm from './components/AuthForm';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
+import SEOContent from './components/SEOContent';
 import './App.css';
 import LoadingDots from './components/LoadingDots';
 
@@ -110,13 +111,19 @@ function App() {
 
   if (!isAuthenticated) {
     if (showLandingPage) {
-      return <LandingPage onGetStarted={handleGetStarted} />;
+      return (
+        <>
+          <SEOContent />
+          <LandingPage onGetStarted={handleGetStarted} />
+        </>
+      );
     }
     
     return (
       <ThemeProvider>
         <ToastProvider>
-          <AuthForm 
+          <SEOContent />
+          <AuthForm
             onLogin={handleLogin}
             onRegister={handleRegister}
             isLoading={isLoading}
@@ -130,6 +137,7 @@ function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
+        <SEOContent />
         <div className="min-h-screen bg-white dark:bg-black">
           <Dashboard user={user} onSignOut={handleSignOut} />
         </div>
