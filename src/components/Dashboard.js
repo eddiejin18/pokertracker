@@ -62,12 +62,16 @@ const Dashboard = ({ user, onSignOut }) => {
       setError(null);
       
       let sessions = await ApiService.getSessions();
+      
+      console.log('Raw sessions from API:', sessions);
+      console.log('Number of raw sessions:', sessions.length);
 
       // Populate blinds options from all sessions
       const uniqueBlinds = Array.from(new Set(sessions.map(s => s.blinds).filter(Boolean)));
       setBlindsOptions(uniqueBlinds);
 
       // Apply filters
+      const originalSessions = [...sessions]; // Keep original for debugging
       sessions = sessions.filter(s => {
         const matchesLocation = filters.location === 'ALL' || s.location === filters.location;
         const matchesGame = filters.gameType === 'ALL' || (s.game_type || s.gameType) === filters.gameType;
@@ -77,8 +81,22 @@ const Dashboard = ({ user, onSignOut }) => {
         const d = new Date(ts);
         const afterStart = !filters.startDate || d >= new Date(filters.startDate + 'T00:00:00');
         const beforeEnd = !filters.endDate || d <= new Date(filters.endDate + 'T23:59:59');
+        
+        console.log('Filtering session:', s);
+        console.log('Matches location:', matchesLocation, 'Location:', s.location, 'Filter:', filters.location);
+        console.log('Matches game:', matchesGame, 'Game:', s.game_type || s.gameType, 'Filter:', filters.gameType);
+        console.log('Matches blinds:', matchesBlinds, 'Blinds:', s.blinds, 'Filter:', filters.blinds);
+        console.log('Matches location type:', matchesLocType, 'Location type:', s.location_type || s.locationType, 'Filter:', filters.locationType);
+        console.log('After start:', afterStart, 'Date:', d, 'Start:', filters.startDate);
+        console.log('Before end:', beforeEnd, 'Date:', d, 'End:', filters.endDate);
+        console.log('Final match:', matchesLocation && matchesGame && matchesBlinds && matchesLocType && afterStart && beforeEnd);
+        console.log('---');
+        
         return matchesLocation && matchesGame && matchesBlinds && matchesLocType && afterStart && beforeEnd;
       });
+      
+      console.log('Original sessions count:', originalSessions.length);
+      console.log('Filtered sessions count:', sessions.length);
       const recentSessions = sessions.slice(-5).reverse();
       
       // Calculate stats from sessions
@@ -86,6 +104,10 @@ const Dashboard = ({ user, onSignOut }) => {
       const chartData = calculateChartData(sessions, selectedPeriod);
       const gameTypeStats = calculateGameTypeStats(sessions);
       const locationStats = calculateLocationStats(sessions);
+      
+      console.log('Filtered sessions after applying filters:', sessions);
+      console.log('Number of filtered sessions:', sessions.length);
+      console.log('Recent sessions:', recentSessions);
       
       setStats(statsData);
       setChartData(chartData);
@@ -314,6 +336,7 @@ const Dashboard = ({ user, onSignOut }) => {
     
     console.log('All sessions:', sessions);
     console.log('Summary period:', period);
+    console.log('Current time:', now);
     
     let startDate;
     switch (period) {
@@ -338,15 +361,44 @@ const Dashboard = ({ user, onSignOut }) => {
         return false;
       }
       
-      const sessionDate = new Date(session.timestamp);
+      // Handle different timestamp formats
+      let sessionDate;
+      if (typeof session.timestamp === 'string') {
+        // If it's a string, try to parse it
+        sessionDate = new Date(session.timestamp);
+      } else if (session.timestamp instanceof Date) {
+        sessionDate = session.timestamp;
+      } else {
+        console.log('Invalid timestamp format:', session.timestamp);
+        return false;
+      }
+      
+      // Check if the date is valid
+      if (isNaN(sessionDate.getTime())) {
+        console.log('Invalid date:', session.timestamp, 'Parsed as:', sessionDate);
+        return false;
+      }
+      
       const isInRange = sessionDate >= startDate;
       
-      console.log('Session date:', sessionDate, 'Start date:', startDate, 'In range:', isInRange);
+      console.log('Session:', session);
+      console.log('Session timestamp:', session.timestamp);
+      console.log('Session date:', sessionDate);
+      console.log('Start date:', startDate);
+      console.log('In range:', isInRange);
+      console.log('---');
       
       return isInRange;
     });
     
     console.log('Filtered sessions for', period, ':', filtered);
+    
+    // If no sessions match the date filter, return all sessions as fallback
+    if (filtered.length === 0 && sessions.length > 0) {
+      console.log('No sessions found in date range, returning all sessions as fallback');
+      return sessions;
+    }
+    
     return filtered;
   };
 
