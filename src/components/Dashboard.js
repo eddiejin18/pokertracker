@@ -424,35 +424,28 @@ const Dashboard = ({ user, onSignOut }) => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="relative inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-100 dark:bg-gray-800">
-                {/* Active tab background */}
-                <div
-                  className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-out bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-600`}
-                  style={{ 
-                    left: activeView === 'dashboard' ? '4px' : 'calc(50% + 2px)',
-                    width: 'calc(50% - 4px)',
-                  }}
-                />
+              {/* Navigation Tabs */}
+              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 inline-flex items-center ${
-                    activeView === 'dashboard' 
-                      ? 'text-gray-900 dark:text-white' 
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    activeView === 'dashboard'
+                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  <Home className="h-4 w-4 mr-1.5" />
+                  <Home className="h-4 w-4 mr-2" />
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 inline-flex items-center ${
-                    activeView === 'calendar' 
-                      ? 'text-gray-900 dark:text-white' 
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    activeView === 'calendar'
+                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  <CalendarIcon className="h-4 w-4 mr-1.5" />
+                  <CalendarIcon className="h-4 w-4 mr-2" />
                   Sessions
                 </button>
               </div>
