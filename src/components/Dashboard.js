@@ -351,8 +351,11 @@ const Dashboard = ({ user, onSignOut }) => {
               <div className="relative inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-100 dark:bg-gray-800">
                 {/* Sliding highlight */}
                 <div
-                  className={`absolute top-1 bottom-1 left-1 w-1/2 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
-                  style={{ transform: activeView === 'calendar' ? 'translateX(100%)' : 'translateX(0%)' }}
+                  className={`absolute top-1 bottom-1 left-1 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
+                  style={{ 
+                    width: 'calc(50% - 2px)',
+                    transform: activeView === 'calendar' ? 'translateX(calc(100% + 2px))' : 'translateX(0%)' 
+                  }}
                 />
                 <button
                   onClick={() => setActiveView('dashboard')}
@@ -497,7 +500,7 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
           {/* Winnings Chart */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
@@ -602,11 +605,13 @@ const Dashboard = ({ user, onSignOut }) => {
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Sessions</h3>
-              <SessionList 
-                sessions={recentSessions} 
-                onSessionUpdated={loadData}
-                onEditSession={handleEditSession}
-              />
+              <div className="max-h-96 overflow-y-auto">
+                <SessionList 
+                  sessions={recentSessions} 
+                  onSessionUpdated={loadData}
+                  onEditSession={handleEditSession}
+                />
+              </div>
             </div>
           </div>
         </div>
