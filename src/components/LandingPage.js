@@ -36,7 +36,7 @@ const LandingPage = ({ onGetStarted }) => {
         <div className="text-center">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <Star className="w-4 h-4 mr-2 text-yellow-500" />
-            Completely free and simple to use
+            Completely free and intuitive
           </div>
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight animate-fade-in" style={{ animationDelay: '0.4s' }}>
             The poker tracker built for <span className="text-gray-500 dark:text-gray-400">winning</span>
