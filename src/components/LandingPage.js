@@ -333,75 +333,8 @@ const LandingPage = ({ onGetStarted }) => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.1s' }}>
-            <div className="flex items-center mb-4">
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                ))}
-              </div>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
-              "Finally, a poker tracker that's actually easy to use. I've been tracking my sessions for 6 months and my hourly rate has improved by 40%."
-            </p>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">MJ</span>
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900 dark:text-white">Mike Johnson</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Professional Player</div>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.2s' }}>
-            <div className="flex items-center mb-4">
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                ))}
-              </div>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
-              "Better than Poker Tracker 4 and completely free. The interface is clean and the analytics are exactly what I need."
-            </p>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">SL</span>
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900 dark:text-white">Sarah Lee</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Tournament Player</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.3s' }}>
-            <div className="flex items-center mb-4">
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                ))}
-              </div>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
-              "I was using Excel spreadsheets before this. This is so much easier and gives me better insights into my game."
-            </p>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">DR</span>
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900 dark:text-white">David Rodriguez</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Cash Game Player</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center animate-fade-in" style={{ animationDelay: '2.4s' }}>
+        <div className="text-center animate-fade-in" style={{ animationDelay: '2.1s' }}>
           <div className="inline-flex items-center space-x-8 text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5" />
@@ -425,16 +358,16 @@ const LandingPage = ({ onGetStarted }) => {
       {/* FAQ Section */}
       <div className="max-w-4xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.5s' }}>
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.2s' }}>
             Frequently Asked Questions
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in" style={{ animationDelay: '2.6s' }}>
+          <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in" style={{ animationDelay: '2.3s' }}>
             Everything you need to know about our free poker tracker
           </p>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.7s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.4s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Is this poker tracker really free?
             </h3>
@@ -443,7 +376,7 @@ const LandingPage = ({ onGetStarted }) => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.8s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.5s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               How is this better than Excel spreadsheets?
             </h3>
@@ -452,7 +385,7 @@ const LandingPage = ({ onGetStarted }) => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.9s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.6s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Can I track sessions from multiple sites?
             </h3>
@@ -461,7 +394,7 @@ const LandingPage = ({ onGetStarted }) => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '3.0s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.7s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               What poker statistics can I track?
             </h3>
@@ -475,13 +408,13 @@ const LandingPage = ({ onGetStarted }) => {
       {/* CTA Section */}
       <div className="bg-gray-50 dark:bg-gray-900 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '3.1s' }}>
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.8s' }}>
             Ready to improve your poker game?
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 animate-fade-in" style={{ animationDelay: '3.2s' }}>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 animate-fade-in" style={{ animationDelay: '2.9s' }}>
             Start tracking your sessions today with the best free poker tracker.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '3.3s' }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '3.0s' }}>
             <button
               onClick={onGetStarted}
               className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-lg"
@@ -506,7 +439,7 @@ const LandingPage = ({ onGetStarted }) => {
       {/* Footer */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center animate-fade-in" style={{ animationDelay: '3.4s' }}>
+          <div className="text-center animate-fade-in" style={{ animationDelay: '3.1s' }}>
             <div className="flex items-center justify-center space-x-3 mb-6">
               <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-white">
                 <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:invert" />
@@ -525,7 +458,7 @@ const LandingPage = ({ onGetStarted }) => {
             </button>
           </div>
           
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-12 animate-fade-in" style={{ animationDelay: '3.5s' }}>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-12 animate-fade-in" style={{ animationDelay: '3.2s' }}>
             <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
               © 2025 Poker Tracker. All rights reserved.
             </div>
