@@ -11,8 +11,8 @@ const LandingPage = ({ onGetStarted }) => {
       <nav className="relative px-6 py-6 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-              <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain" />
+            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-white">
+              <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:invert" />
             </div>
             <span className="text-xl font-semibold text-gray-900 dark:text-white">Poker Tracker</span>
           </div>
@@ -508,8 +508,8 @@ const LandingPage = ({ onGetStarted }) => {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="animate-fade-in" style={{ animationDelay: '3.4s' }}>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="h-8 w-8 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-                  <img src="/favicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain" />
+                <div className="h-8 w-8 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-white">
+                  <img src="/favicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain dark:invert" />
                 </div>
                 <span className="text-xl font-semibold text-gray-900 dark:text-white">Poker Tracker</span>
               </div>
