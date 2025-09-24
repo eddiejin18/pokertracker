@@ -427,8 +427,8 @@ const Dashboard = ({ user, onSignOut }) => {
                   className={`absolute top-1 bottom-1 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
                   style={{ 
                     left: '4px',
-                    width: 'calc(50% - 4px)',
-                    transform: activeView === 'calendar' ? 'translateX(calc(100% + 4px))' : 'translateX(0%)' 
+                    width: 'calc(50% - 6px)',
+                    transform: activeView === 'calendar' ? 'translateX(calc(100% + 2px))' : 'translateX(0%)' 
                   }}
                 />
                 <button
