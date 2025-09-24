@@ -412,7 +412,8 @@ const LandingPage = ({ onGetStarted }) => {
             <div className="animate-fade-in" style={{ animationDelay: '2.8s' }}>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="h-8 w-8 rounded-lg overflow-hidden flex items-center justify-center border border-gray-600 bg-white">
-                  <img src="/favicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain" />
+                  <img src="/favicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain dark:hidden" />
+                  <img src="/invertedicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain hidden dark:block" />
                 </div>
                 <span className="text-xl font-semibold text-white">Poker Tracker</span>
               </div>
