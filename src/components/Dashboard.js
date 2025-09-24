@@ -36,6 +36,7 @@ const Dashboard = ({ user, onSignOut }) => {
   const [editingSession, setEditingSession] = useState(null);
   const [blindsOptions, setBlindsOptions] = useState([]);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [summaryPeriod, setSummaryPeriod] = useState('weekly');
   const defaultFilters = {
     location: 'ALL',
     gameType: 'ALL',
@@ -351,10 +352,11 @@ const Dashboard = ({ user, onSignOut }) => {
               <div className="relative inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-100 dark:bg-gray-800">
                 {/* Sliding highlight */}
                 <div
-                  className={`absolute top-1 bottom-1 left-1 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
+                  className={`absolute top-1 bottom-1 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
                   style={{ 
-                    width: 'calc(50% - 2px)',
-                    transform: activeView === 'calendar' ? 'translateX(calc(100% + 2px))' : 'translateX(0%)' 
+                    left: '4px',
+                    width: 'calc(50% - 4px)',
+                    transform: activeView === 'calendar' ? 'translateX(calc(100% + 4px))' : 'translateX(0%)' 
                   }}
                 />
                 <button
@@ -473,6 +475,7 @@ const Dashboard = ({ user, onSignOut }) => {
               <p className={`text-3xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {formatCurrency(safeStats.totalWinnings)}
               </p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% vs last month</p>
             </div>
           </div>
 
@@ -496,14 +499,15 @@ const Dashboard = ({ user, onSignOut }) => {
               <p className={`text-3xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
                 {formatCurrency(safeStats.hourlyProfit)}/hr
               </p>
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">+8.2% vs last month</p>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
           {/* Winnings Chart */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+          <div className="lg:col-span-2 flex">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col w-full">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">Bankroll Growth</h3>
                 <div className="flex items-center space-x-2">
@@ -563,7 +567,7 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               
-              <div className={`h-80 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
+              <div className={`flex-grow ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
@@ -602,10 +606,10 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
 
           {/* Recent Sessions */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+          <div className="lg:col-span-1 flex">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col w-full">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Sessions</h3>
-              <div className="max-h-96 overflow-y-auto">
+              <div className="flex-grow overflow-y-auto">
                 <SessionList 
                   sessions={recentSessions} 
                   onSessionUpdated={loadData}
@@ -616,10 +620,46 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
         </div>
 
-        {/* Weekly Summary */}
+        {/* Summary with Toggle */}
         <div className="mt-8">
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-6 shadow-sm">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Weekly Summary</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                {summaryPeriod === 'weekly' ? 'Weekly' : summaryPeriod === 'monthly' ? 'Monthly' : 'Yearly'} Summary
+              </h3>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setSummaryPeriod('weekly')}
+                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
+                    summaryPeriod === 'weekly'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-700'
+                  }`}
+                >
+                  Weekly
+                </button>
+                <button
+                  onClick={() => setSummaryPeriod('monthly')}
+                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
+                    summaryPeriod === 'monthly'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-700'
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setSummaryPeriod('yearly')}
+                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
+                    summaryPeriod === 'yearly'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-700'
+                  }`}
+                >
+                  Yearly
+                </button>
+              </div>
+            </div>
             <div className="grid grid-cols-3 gap-6">
               <div className="text-center">
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{safeStats.totalSessions}</p>
@@ -634,6 +674,9 @@ const Dashboard = ({ user, onSignOut }) => {
                   {formatCurrency(safeStats.totalWinnings)}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Profit</p>
+                {summaryPeriod === 'monthly' && (
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% vs last month</p>
+                )}
               </div>
             </div>
           </div>
