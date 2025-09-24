@@ -312,6 +312,9 @@ const Dashboard = ({ user, onSignOut }) => {
     // Use all sessions data
     const sessions = allSessions || [];
     
+    console.log('All sessions:', sessions);
+    console.log('Summary period:', period);
+    
     let startDate;
     switch (period) {
       case 'weekly':
@@ -327,7 +330,24 @@ const Dashboard = ({ user, onSignOut }) => {
         return sessions;
     }
     
-    return sessions.filter(session => new Date(session.timestamp) >= startDate);
+    console.log('Start date for', period, ':', startDate);
+    
+    const filtered = sessions.filter(session => {
+      if (!session.timestamp) {
+        console.log('Session missing timestamp:', session);
+        return false;
+      }
+      
+      const sessionDate = new Date(session.timestamp);
+      const isInRange = sessionDate >= startDate;
+      
+      console.log('Session date:', sessionDate, 'Start date:', startDate, 'In range:', isInRange);
+      
+      return isInRange;
+    });
+    
+    console.log('Filtered sessions for', period, ':', filtered);
+    return filtered;
   };
 
   // Get previous period data for comparison
@@ -425,20 +445,12 @@ const Dashboard = ({ user, onSignOut }) => {
             </div>
             <div className="flex items-center space-x-4">
               {/* Navigation Tabs */}
-              <div className="relative flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                {/* Sliding highlight */}
-                <div
-                  className="absolute top-1 bottom-1 bg-white dark:bg-gray-900 rounded-md shadow-sm transition-all duration-300 ease-out"
-                  style={{
-                    left: activeView === 'dashboard' ? '4px' : 'calc(50% + 4px)',
-                    width: 'calc(50% - 6px)',
-                  }}
-                />
+              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`relative z-10 flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'dashboard'
-                      ? 'text-gray-900 dark:text-white'
+                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
@@ -447,9 +459,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`relative z-10 flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'calendar'
-                      ? 'text-gray-900 dark:text-white'
+                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
@@ -749,10 +761,12 @@ const Dashboard = ({ user, onSignOut }) => {
                 const filteredSessions = filteredData.length;
                 const filteredHours = filteredData.reduce((sum, session) => {
                   const duration = session.duration || 0;
+                  console.log('Session duration:', session.duration, 'Parsed:', duration);
                   return sum + (isNaN(duration) ? 0 : duration);
                 }, 0);
                 const filteredWinnings = filteredData.reduce((sum, session) => {
                   const winnings = session.winnings || 0;
+                  console.log('Session winnings:', session.winnings, 'Parsed:', winnings);
                   return sum + (isNaN(winnings) ? 0 : winnings);
                 }, 0);
                 
