@@ -425,19 +425,20 @@ const Dashboard = ({ user, onSignOut }) => {
             </div>
             <div className="flex items-center space-x-4">
               <div className="relative inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-100 dark:bg-gray-800">
-                {/* Sliding highlight */}
+                {/* Active tab background */}
                 <div
-                  className={`absolute top-1 bottom-1 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
+                  className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-out bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-600`}
                   style={{ 
-                    left: '4px',
-                    width: 'calc(50% - 6px)',
-                    transform: activeView === 'calendar' ? 'translateX(calc(100% + 2px))' : 'translateX(0%)' 
+                    left: activeView === 'dashboard' ? '4px' : 'calc(50% + 2px)',
+                    width: 'calc(50% - 4px)',
                   }}
                 />
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
-                    activeView === 'dashboard' ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
+                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 inline-flex items-center ${
+                    activeView === 'dashboard' 
+                      ? 'text-gray-900 dark:text-white' 
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                   }`}
                 >
                   <Home className="h-4 w-4 mr-1.5" />
@@ -445,8 +446,10 @@ const Dashboard = ({ user, onSignOut }) => {
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
-                    activeView === 'calendar' ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
+                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 inline-flex items-center ${
+                    activeView === 'calendar' 
+                      ? 'text-gray-900 dark:text-white' 
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                   }`}
                 >
                   <CalendarIcon className="h-4 w-4 mr-1.5" />
