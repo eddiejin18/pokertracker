@@ -26,7 +26,6 @@ const Dashboard = ({ user, onSignOut }) => {
   const [chartData, setChartData] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1M');
   const [recentSessions, setRecentSessions] = useState([]);
-  const [allSessions, setAllSessions] = useState([]);
   const [activeView, setActiveView] = useState('dashboard');
   const [gameTypeData, setGameTypeData] = useState([]);
   const [locationData, setLocationData] = useState([]);
@@ -37,7 +36,6 @@ const Dashboard = ({ user, onSignOut }) => {
   const [editingSession, setEditingSession] = useState(null);
   const [blindsOptions, setBlindsOptions] = useState([]);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
-  const [summaryPeriod, setSummaryPeriod] = useState('weekly');
   const defaultFilters = {
     location: 'ALL',
     gameType: 'ALL',
@@ -62,16 +60,12 @@ const Dashboard = ({ user, onSignOut }) => {
       setError(null);
       
       let sessions = await ApiService.getSessions();
-      
-      console.log('Raw sessions from API:', sessions);
-      console.log('Number of raw sessions:', sessions.length);
 
       // Populate blinds options from all sessions
       const uniqueBlinds = Array.from(new Set(sessions.map(s => s.blinds).filter(Boolean)));
       setBlindsOptions(uniqueBlinds);
 
       // Apply filters
-      const originalSessions = [...sessions]; // Keep original for debugging
       sessions = sessions.filter(s => {
         const matchesLocation = filters.location === 'ALL' || s.location === filters.location;
         const matchesGame = filters.gameType === 'ALL' || (s.game_type || s.gameType) === filters.gameType;
@@ -81,22 +75,8 @@ const Dashboard = ({ user, onSignOut }) => {
         const d = new Date(ts);
         const afterStart = !filters.startDate || d >= new Date(filters.startDate + 'T00:00:00');
         const beforeEnd = !filters.endDate || d <= new Date(filters.endDate + 'T23:59:59');
-        
-        console.log('Filtering session:', s);
-        console.log('Matches location:', matchesLocation, 'Location:', s.location, 'Filter:', filters.location);
-        console.log('Matches game:', matchesGame, 'Game:', s.game_type || s.gameType, 'Filter:', filters.gameType);
-        console.log('Matches blinds:', matchesBlinds, 'Blinds:', s.blinds, 'Filter:', filters.blinds);
-        console.log('Matches location type:', matchesLocType, 'Location type:', s.location_type || s.locationType, 'Filter:', filters.locationType);
-        console.log('After start:', afterStart, 'Date:', d, 'Start:', filters.startDate);
-        console.log('Before end:', beforeEnd, 'Date:', d, 'End:', filters.endDate);
-        console.log('Final match:', matchesLocation && matchesGame && matchesBlinds && matchesLocType && afterStart && beforeEnd);
-        console.log('---');
-        
         return matchesLocation && matchesGame && matchesBlinds && matchesLocType && afterStart && beforeEnd;
       });
-      
-      console.log('Original sessions count:', originalSessions.length);
-      console.log('Filtered sessions count:', sessions.length);
       const recentSessions = sessions.slice(-5).reverse();
       
       // Calculate stats from sessions
@@ -105,14 +85,9 @@ const Dashboard = ({ user, onSignOut }) => {
       const gameTypeStats = calculateGameTypeStats(sessions);
       const locationStats = calculateLocationStats(sessions);
       
-      console.log('Filtered sessions after applying filters:', sessions);
-      console.log('Number of filtered sessions:', sessions.length);
-      console.log('Recent sessions:', recentSessions);
-      
       setStats(statsData);
       setChartData(chartData);
       setRecentSessions(recentSessions);
-      setAllSessions(sessions);
       setGameTypeData(gameTypeStats);
       setLocationData(locationStats);
     } catch (error) {
@@ -322,115 +297,6 @@ const Dashboard = ({ user, onSignOut }) => {
     return `${h}h ${m}m`;
   };
 
-  // Calculate percentage change from previous period
-  const calculatePercentageChange = (current, previous) => {
-    if (previous === 0) return current > 0 ? 100 : 0;
-    return ((current - previous) / Math.abs(previous)) * 100;
-  };
-
-  // Get filtered data based on summary period
-  const getFilteredData = (period) => {
-    const now = new Date();
-    // Use all sessions data
-    const sessions = allSessions || [];
-    
-    console.log('All sessions:', sessions);
-    console.log('Summary period:', period);
-    console.log('Current time:', now);
-    
-    let startDate;
-    switch (period) {
-      case 'weekly':
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case 'monthly':
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case 'yearly':
-        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        return sessions;
-    }
-    
-    console.log('Start date for', period, ':', startDate);
-    
-    const filtered = sessions.filter(session => {
-      if (!session.timestamp) {
-        console.log('Session missing timestamp:', session);
-        return false;
-      }
-      
-      // Handle different timestamp formats
-      let sessionDate;
-      if (typeof session.timestamp === 'string') {
-        // If it's a string, try to parse it
-        sessionDate = new Date(session.timestamp);
-      } else if (session.timestamp instanceof Date) {
-        sessionDate = session.timestamp;
-      } else {
-        console.log('Invalid timestamp format:', session.timestamp);
-        return false;
-      }
-      
-      // Check if the date is valid
-      if (isNaN(sessionDate.getTime())) {
-        console.log('Invalid date:', session.timestamp, 'Parsed as:', sessionDate);
-        return false;
-      }
-      
-      const isInRange = sessionDate >= startDate;
-      
-      console.log('Session:', session);
-      console.log('Session timestamp:', session.timestamp);
-      console.log('Session date:', sessionDate);
-      console.log('Start date:', startDate);
-      console.log('In range:', isInRange);
-      console.log('---');
-      
-      return isInRange;
-    });
-    
-    console.log('Filtered sessions for', period, ':', filtered);
-    
-    // If no sessions match the date filter, return all sessions as fallback
-    if (filtered.length === 0 && sessions.length > 0) {
-      console.log('No sessions found in date range, returning all sessions as fallback');
-      return sessions;
-    }
-    
-    return filtered;
-  };
-
-  // Get previous period data for comparison
-  const getPreviousPeriodData = (period) => {
-    const now = new Date();
-    const sessions = allSessions || [];
-    
-    let startDate, endDate;
-    switch (period) {
-      case 'weekly':
-        endDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        startDate = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-        break;
-      case 'monthly':
-        endDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        startDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
-        break;
-      case 'yearly':
-        endDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-        startDate = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        return [];
-    }
-    
-    return sessions.filter(session => {
-      const sessionDate = new Date(session.timestamp);
-      return sessionDate >= startDate && sessionDate < endDate;
-    });
-  };
-
   if (isInitialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -465,72 +331,57 @@ const Dashboard = ({ user, onSignOut }) => {
     averageWinnings: 0
   };
 
-  // Calculate real percentage changes
-  const currentPeriodData = getFilteredData('monthly');
-  const previousPeriodData = getPreviousPeriodData('monthly');
-  
-  const currentWinnings = currentPeriodData.reduce((sum, session) => sum + (session.winnings || 0), 0);
-  const previousWinnings = previousPeriodData.reduce((sum, session) => sum + (session.winnings || 0), 0);
-  const winningsPercentageChange = calculatePercentageChange(currentWinnings, previousWinnings);
-  
-  const currentHours = currentPeriodData.reduce((sum, session) => sum + (session.duration || 0), 0);
-  const previousHours = previousPeriodData.reduce((sum, session) => sum + (session.duration || 0), 0);
-  const currentHourlyRate = currentHours > 0 ? currentWinnings / currentHours : 0;
-  const previousHourlyRate = previousHours > 0 ? previousWinnings / previousHours : 0;
-  const hourlyRatePercentageChange = calculatePercentageChange(currentHourlyRate, previousHourlyRate);
-
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between items-center py-6">
+      <header className="sticky top-0 z-50 bg-white/70 dark:bg-black/60 backdrop-blur border-b border-black/5 dark:border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
-                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:hidden" />
-                <img src="/invertedicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain hidden dark:block" />
+              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-black/10 dark:border-white/10 bg-white dark:bg-white">
+                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Poker Tracker</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Welcome back, {user?.name}</p>
+                <h1 className="text-2xl font-bold text-black dark:text-white">Poker Tracker</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Welcome back, {user?.name}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Navigation Tabs */}
-              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <div className="relative inline-flex items-center border border-black/10 dark:border-white/10 rounded-lg p-1">
+                {/* Sliding highlight */}
+                <div
+                  className={`absolute top-1 bottom-1 left-1 w-1/2 rounded-md transition-transform duration-300 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}
+                  style={{ transform: activeView === 'calendar' ? 'translateX(100%)' : 'translateX(0%)' }}
+                />
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`flex items-center justify-start px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 w-32 ${
-                    activeView === 'dashboard'
-                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  className={`relative z-10 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
+                    activeView === 'dashboard' ? (theme === 'dark' ? 'text-black' : 'text-white') : 'text-black dark:text-white'
                   }`}
                 >
-                  <Home className="h-5 w-5 mr-2" />
+                  <Home className="h-4 w-4 mr-1 align-middle" />
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`flex items-center justify-start px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 w-32 ${
-                    activeView === 'calendar'
-                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  className={`relative z-10 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
+                    activeView === 'calendar' ? (theme === 'dark' ? 'text-black' : 'text-white') : 'text-black dark:text-white'
                   }`}
                 >
-                  <CalendarIcon className="h-5 w-5 mr-2" />
+                  <CalendarIcon className="h-4 w-4 mr-1 align-middle" />
                   Sessions
                 </button>
               </div>
               <ThemeToggle />
               <button
                 onClick={() => setIsSupportOpen(true)}
-                className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="btn"
               >
                 Contact Support
               </button>
               <button
                 onClick={onSignOut}
-                className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors inline-flex items-center"
+                className="btn"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
@@ -540,7 +391,7 @@ const Dashboard = ({ user, onSignOut }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 text-gray-900 dark:text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black dark:text-white">
         {activeView === 'dashboard' && (
           <>
             {/* Filters */}
@@ -612,101 +463,95 @@ const Dashboard = ({ user, onSignOut }) => {
           <>
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Winnings</p>
-              <p className={`text-3xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Winnings</p>
+              <p className={`text-2xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
                 {formatCurrency(safeStats.totalWinnings)}
               </p>
-              <p className={`text-xs mt-1 ${winningsPercentageChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {winningsPercentageChange >= 0 ? '+' : ''}{winningsPercentageChange.toFixed(1)}% vs last month
-              </p>
             </div>
           </div>
 
-          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Sessions Played</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{safeStats.totalSessions}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sessions Played</p>
+              <p className="text-2xl font-bold text-black dark:text-white">{safeStats.totalSessions}</p>
             </div>
           </div>
 
-          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Hours</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatDuration(safeStats.totalHours)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hours</p>
+              <p className="text-2xl font-bold text-black dark:text-white">{formatDuration(safeStats.totalHours)}</p>
             </div>
           </div>
 
-          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Hourly Rate</p>
-              <p className={`text-3xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Hourly Profit</p>
+              <p className={`text-2xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
                 {formatCurrency(safeStats.hourlyProfit)}/hr
-              </p>
-              <p className={`text-xs mt-1 ${hourlyRatePercentageChange >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
-                {hourlyRatePercentageChange >= 0 ? '+' : ''}{hourlyRatePercentageChange.toFixed(1)}% vs last month
               </p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Winnings Chart */}
-          <div className="lg:col-span-2 flex">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col w-full">
+          <div className="lg:col-span-2">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Bankroll Growth</h3>
+                <h3 className="text-lg font-semibold text-black dark:text-white">Winnings Over Time</h3>
                 <div className="flex items-center space-x-2">
                   {isRefreshing && (
                     <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin text-black dark:text-white" />
                   )}
                   <button
                     onClick={() => setSelectedPeriod('1W')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '1W'
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     1W
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('1M')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '1M'
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     1M
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('3M')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '3M'
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     3M
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('1Y')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === '1Y'
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     1Y
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('ALL')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       selectedPeriod === 'ALL'
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
                     }`}
                   >
                     ALL
@@ -714,7 +559,7 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               
-              <div className={`h-96 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
+              <div className={`h-80 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
@@ -753,105 +598,60 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
 
           {/* Recent Sessions */}
-          <div className="lg:col-span-1 flex">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col w-full">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Sessions</h3>
-              <div className="h-96 overflow-y-auto">
-                <SessionList 
-                  sessions={recentSessions} 
-                  onSessionUpdated={loadData}
-                  onEditSession={handleEditSession}
-                />
-              </div>
+          <div className="lg:col-span-1">
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
+              <SessionList 
+                sessions={recentSessions} 
+                onSessionUpdated={loadData}
+                onEditSession={handleEditSession}
+              />
             </div>
           </div>
         </div>
 
-        {/* Summary with Toggle */}
-        <div className="mt-8">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {summaryPeriod === 'weekly' ? 'Weekly' : summaryPeriod === 'monthly' ? 'Monthly' : 'Yearly'} Summary
+        {/* Additional Stats */}
+        {safeStats.bestSession && (
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <TrendingUp className="h-5 w-5 text-success-600 mr-2" />
+                Best Session
               </h3>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setSummaryPeriod('weekly')}
-                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
-                    summaryPeriod === 'weekly'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-700'
-                  }`}
-                >
-                  Weekly
-                </button>
-                <button
-                  onClick={() => setSummaryPeriod('monthly')}
-                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
-                    summaryPeriod === 'monthly'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-700'
-                  }`}
-                >
-                  Monthly
-                </button>
-                <button
-                  onClick={() => setSummaryPeriod('yearly')}
-                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
-                    summaryPeriod === 'yearly'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-700'
-                  }`}
-                >
-                  Yearly
-                </button>
+              <div className="space-y-2">
+                <p className="text-2xl font-bold text-black">
+                  {formatCurrency(safeStats.bestSession.winnings)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {new Date(safeStats.bestSession.timestamp).toLocaleDateString()}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Duration: {formatDuration(safeStats.bestSession.duration || 0)}
+                </p>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-6">
-              {(() => {
-                const filteredData = getFilteredData(summaryPeriod);
-                const filteredSessions = filteredData.length;
-                const filteredHours = filteredData.reduce((sum, session) => {
-                  const duration = session.duration || 0;
-                  console.log('Session duration:', session.duration, 'Parsed:', duration);
-                  return sum + (isNaN(duration) ? 0 : duration);
-                }, 0);
-                const filteredWinnings = filteredData.reduce((sum, session) => {
-                  const winnings = session.winnings || 0;
-                  console.log('Session winnings:', session.winnings, 'Parsed:', winnings);
-                  return sum + (isNaN(winnings) ? 0 : winnings);
-                }, 0);
-                
-                // Debug logging
-                console.log('Summary Period:', summaryPeriod);
-                console.log('Filtered Data:', filteredData);
-                console.log('Filtered Hours:', filteredHours);
-                console.log('Filtered Winnings:', filteredWinnings);
-                
-                return (
-                  <>
-                    <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white">{filteredSessions}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sessions</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                        {isNaN(filteredHours) ? '0h 0m' : formatDuration(filteredHours)}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Time</p>
-                    </div>
-                    <div className="text-center">
-                      <p className={`text-3xl font-bold ${filteredWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {isNaN(filteredWinnings) ? '$0.00' : formatCurrency(filteredWinnings)}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Profit</p>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
+
+            {safeStats.worstSession && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <TrendingDown className="h-5 w-5 text-danger-600 mr-2" />
+                  Worst Session
+                </h3>
+                <div className="space-y-2">
+                  <p className="text-2xl font-bold text-gray-600">
+                    {formatCurrency(safeStats.worstSession.winnings)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {new Date(safeStats.worstSession.timestamp).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Duration: {formatDuration(safeStats.worstSession.duration || 0)}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
           </>
         )}
       </div>
