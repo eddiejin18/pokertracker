@@ -202,7 +202,12 @@ const Dashboard = ({ user, onSignOut }) => {
     
     // Sort by actual chronological key, then format label for display
     const entries = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+    
+    // Calculate cumulative profit over time
+    let cumulativeProfit = 0;
     return entries.map(([periodKey, data]) => {
+      cumulativeProfit += data.winnings;
+      
       let label;
       if (period === '1W' || period === '1M') {
         label = new Date(periodKey + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -214,7 +219,7 @@ const Dashboard = ({ user, onSignOut }) => {
 
       return {
         period: label,
-        winnings: data.winnings,
+        winnings: cumulativeProfit, // Show cumulative profit instead of daily winnings
         sessions: data.sessions,
         hours: data.hours
       };
@@ -505,9 +510,9 @@ const Dashboard = ({ user, onSignOut }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Winnings Chart */}
           <div className="lg:col-span-2">
-            <div className="card p-6">
+            <div className="card p-6 h-96">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-black dark:text-white">Winnings Over Time</h3>
+                <h3 className="text-lg font-semibold text-black dark:text-white">Profit Over Time</h3>
                 <div className="flex items-center space-x-2">
                   {isRefreshing && (
                     <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin text-black dark:text-white" />
@@ -580,7 +585,7 @@ const Dashboard = ({ user, onSignOut }) => {
                       tickFormatter={(value) => `$${value}`}
                     />
                     <Tooltip 
-                      formatter={(value) => [formatCurrency(value), 'Winnings']}
+                      formatter={(value) => [formatCurrency(value), 'Cumulative Profit']}
                       labelStyle={{ color: theme === 'dark' ? '#e5e7eb' : '#374151' }}
                       contentStyle={{
                         backgroundColor: theme === 'dark' ? '#000000' : 'white',
@@ -605,7 +610,7 @@ const Dashboard = ({ user, onSignOut }) => {
 
           {/* Recent Sessions */}
           <div className="lg:col-span-1">
-            <div className="card p-6">
+            <div className="card p-6 h-96">
               <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
               <div className="h-80 overflow-y-auto">
                 <SessionList 
