@@ -26,6 +26,7 @@ const Dashboard = ({ user, onSignOut }) => {
   const [chartData, setChartData] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1M');
   const [recentSessions, setRecentSessions] = useState([]);
+  const [allSessions, setAllSessions] = useState([]);
   const [activeView, setActiveView] = useState('dashboard');
   const [gameTypeData, setGameTypeData] = useState([]);
   const [locationData, setLocationData] = useState([]);
@@ -89,6 +90,7 @@ const Dashboard = ({ user, onSignOut }) => {
       setStats(statsData);
       setChartData(chartData);
       setRecentSessions(recentSessions);
+      setAllSessions(sessions);
       setGameTypeData(gameTypeStats);
       setLocationData(locationStats);
     } catch (error) {
@@ -307,7 +309,8 @@ const Dashboard = ({ user, onSignOut }) => {
   // Get filtered data based on summary period
   const getFilteredData = (period) => {
     const now = new Date();
-    const sessions = recentSessions || [];
+    // Use all sessions data
+    const sessions = allSessions || [];
     
     let startDate;
     switch (period) {
@@ -330,7 +333,7 @@ const Dashboard = ({ user, onSignOut }) => {
   // Get previous period data for comparison
   const getPreviousPeriodData = (period) => {
     const now = new Date();
-    const sessions = recentSessions || [];
+    const sessions = allSessions || [];
     
     let startDate, endDate;
     switch (period) {
@@ -740,8 +743,20 @@ const Dashboard = ({ user, onSignOut }) => {
               {(() => {
                 const filteredData = getFilteredData(summaryPeriod);
                 const filteredSessions = filteredData.length;
-                const filteredHours = filteredData.reduce((sum, session) => sum + (session.duration || 0), 0);
-                const filteredWinnings = filteredData.reduce((sum, session) => sum + (session.winnings || 0), 0);
+                const filteredHours = filteredData.reduce((sum, session) => {
+                  const duration = session.duration || 0;
+                  return sum + (isNaN(duration) ? 0 : duration);
+                }, 0);
+                const filteredWinnings = filteredData.reduce((sum, session) => {
+                  const winnings = session.winnings || 0;
+                  return sum + (isNaN(winnings) ? 0 : winnings);
+                }, 0);
+                
+                // Debug logging
+                console.log('Summary Period:', summaryPeriod);
+                console.log('Filtered Data:', filteredData);
+                console.log('Filtered Hours:', filteredHours);
+                console.log('Filtered Winnings:', filteredWinnings);
                 
                 return (
                   <>
@@ -750,12 +765,14 @@ const Dashboard = ({ user, onSignOut }) => {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sessions</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatDuration(filteredHours)}</p>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                        {isNaN(filteredHours) ? '0h 0m' : formatDuration(filteredHours)}
+                      </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Time</p>
                     </div>
                     <div className="text-center">
                       <p className={`text-3xl font-bold ${filteredWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {formatCurrency(filteredWinnings)}
+                        {isNaN(filteredWinnings) ? '$0.00' : formatCurrency(filteredWinnings)}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Profit</p>
                     </div>
