@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowRight, Calendar, DollarSign, BarChart3, CheckCircle, Star, Users, TrendingUp, Clock, Target, Zap, Mail } from 'lucide-react';
-import { ThemeProvider } from './ThemeProvider';
 import ThemeToggle from './ThemeToggle';
 import SupportModal from './SupportModal';
 
@@ -8,8 +7,7 @@ const LandingPage = ({ onGetStarted }) => {
   const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Navigation */}
       <nav className="relative px-6 py-6 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -605,8 +603,7 @@ const LandingPage = ({ onGetStarted }) => {
       
       {/* Support Modal */}
       <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
-      </div>
-    </ThemeProvider>
+    </div>
   );
 };
 

@@ -112,10 +112,12 @@ function App() {
   if (!isAuthenticated) {
     if (showLandingPage) {
       return (
-        <>
-          <SEOContent />
-          <LandingPage onGetStarted={handleGetStarted} />
-        </>
+        <ThemeProvider>
+          <ToastProvider>
+            <SEOContent />
+            <LandingPage onGetStarted={handleGetStarted} />
+          </ToastProvider>
+        </ThemeProvider>
       );
     }
     
