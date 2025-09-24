@@ -612,7 +612,15 @@ const Dashboard = ({ user, onSignOut }) => {
           <div className="w-full lg:w-80">
             <div className="card p-6 h-full flex flex-col">
               <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
-              <div className="flex-1 min-h-0 overflow-y-auto">
+              <div 
+                className="flex-1 min-h-0 overflow-y-auto"
+                onWheel={(e) => {
+                  e.stopPropagation();
+                }}
+                onTouchMove={(e) => {
+                  e.stopPropagation();
+                }}
+              >
                 <SessionList 
                   sessions={recentSessions} 
                   onSessionUpdated={loadData}
