@@ -1,9 +1,12 @@
-import React from 'react';
-import { ArrowRight, Calendar, DollarSign, BarChart3, CheckCircle, Star, Users, TrendingUp, Clock, Target, Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, Calendar, DollarSign, BarChart3, CheckCircle, Star, Users, TrendingUp, Clock, Target, Zap, Mail } from 'lucide-react';
 import { ThemeProvider } from './ThemeProvider';
 import ThemeToggle from './ThemeToggle';
+import SupportModal from './SupportModal';
 
 const LandingPage = ({ onGetStarted }) => {
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-white dark:bg-black">
@@ -503,60 +506,30 @@ const LandingPage = ({ onGetStarted }) => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="animate-fade-in" style={{ animationDelay: '3.4s' }}>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="h-8 w-8 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-white">
-                  <img src="/favicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain dark:invert" />
-                </div>
-                <span className="text-xl font-semibold text-gray-900 dark:text-white">Poker Tracker</span>
+      <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center animate-fade-in" style={{ animationDelay: '3.4s' }}>
+            <div className="flex items-center justify-center space-x-3 mb-6">
+              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-white">
+                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:invert" />
               </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                The best free poker tracker for serious players. Track your sessions, manage your bankroll, and improve your game.
-              </p>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">Poker Tracker</span>
             </div>
-            
-            <div className="animate-fade-in" style={{ animationDelay: '3.5s' }}>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Product</h3>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Integrations</a></li>
-              </ul>
-            </div>
-            
-            <div className="animate-fade-in" style={{ animationDelay: '3.6s' }}>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Status</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Community</a></li>
-              </ul>
-            </div>
-            
-            <div className="animate-fade-in" style={{ animationDelay: '3.7s' }}>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</a></li>
-              </ul>
-            </div>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+              The best free poker tracker for serious players. Track your sessions, manage your bankroll, and improve your game.
+            </p>
+            <button
+              onClick={() => setIsSupportOpen(true)}
+              className="inline-flex items-center space-x-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 shadow-sm"
+            >
+              <Mail className="w-4 h-4" />
+              <span>Contact Us</span>
+            </button>
           </div>
           
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between animate-fade-in" style={{ animationDelay: '3.8s' }}>
-            <div className="text-gray-600 dark:text-gray-300 text-sm">
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-12 animate-fade-in" style={{ animationDelay: '3.5s' }}>
+            <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
               © 2025 Poker Tracker. All rights reserved.
-            </div>
-            <div className="flex items-center space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm">Terms</a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm">Privacy</a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm">Cookies</a>
             </div>
           </div>
         </div>
@@ -629,6 +602,9 @@ const LandingPage = ({ onGetStarted }) => {
           <li>Poker tracker pt4 free</li>
         </ul>
       </div>
+      
+      {/* Support Modal */}
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
       </div>
     </ThemeProvider>
   );
