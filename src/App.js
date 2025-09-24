@@ -101,6 +101,10 @@ function App() {
     setShowLandingPage(false);
   };
 
+  const handleBackToHome = () => {
+    setShowLandingPage(true);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -130,6 +134,7 @@ function App() {
             onRegister={handleRegister}
             isLoading={isLoading}
             error={error}
+            onBackToHome={handleBackToHome}
           />
         </ToastProvider>
       </ThemeProvider>

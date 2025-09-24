@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
+import { LogIn, UserPlus, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import { useEffect } from 'react';
 
-const AuthForm = ({ onLogin, onRegister, isLoading, error }) => {
+const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,6 +54,15 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error }) => {
       )}
       <div className="max-w-md w-full">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 shadow-sm">
+          {onBackToHome && (
+            <button
+              onClick={onBackToHome}
+              className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              <span className="text-sm font-medium">Back to home</span>
+            </button>
+          )}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Poker Tracker</h1>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
