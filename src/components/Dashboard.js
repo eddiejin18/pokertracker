@@ -436,20 +436,20 @@ const Dashboard = ({ user, onSignOut }) => {
                 />
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`relative z-10 px-4 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
+                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
                     activeView === 'dashboard' ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <Home className="h-4 w-4 mr-2" />
+                  <Home className="h-4 w-4 mr-1.5" />
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`relative z-10 px-4 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
+                  className={`relative z-10 px-3 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
                     activeView === 'calendar' ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  <CalendarIcon className="h-4 w-4 mr-1.5" />
                   Sessions
                 </button>
               </div>
