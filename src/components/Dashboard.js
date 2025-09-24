@@ -425,12 +425,20 @@ const Dashboard = ({ user, onSignOut }) => {
             </div>
             <div className="flex items-center space-x-4">
               {/* Navigation Tabs */}
-              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <div className="relative flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                {/* Sliding highlight */}
+                <div
+                  className={`absolute top-1 bottom-1 bg-white dark:bg-gray-900 rounded-md shadow-sm transition-all duration-300 ease-out`}
+                  style={{
+                    left: activeView === 'dashboard' ? '4px' : 'calc(50% + 2px)',
+                    width: 'calc(50% - 4px)',
+                  }}
+                />
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  className={`relative z-10 flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                     activeView === 'dashboard'
-                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                      ? 'text-gray-900 dark:text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
@@ -439,9 +447,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  className={`relative z-10 flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                     activeView === 'calendar'
-                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                      ? 'text-gray-900 dark:text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
