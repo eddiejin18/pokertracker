@@ -298,6 +298,64 @@ const Dashboard = ({ user, onSignOut }) => {
     return `${h}h ${m}m`;
   };
 
+  // Calculate percentage change from previous period
+  const calculatePercentageChange = (current, previous) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / Math.abs(previous)) * 100;
+  };
+
+  // Get filtered data based on summary period
+  const getFilteredData = (period) => {
+    const now = new Date();
+    const sessions = recentSessions || [];
+    
+    let startDate;
+    switch (period) {
+      case 'weekly':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'monthly':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case 'yearly':
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        return sessions;
+    }
+    
+    return sessions.filter(session => new Date(session.timestamp) >= startDate);
+  };
+
+  // Get previous period data for comparison
+  const getPreviousPeriodData = (period) => {
+    const now = new Date();
+    const sessions = recentSessions || [];
+    
+    let startDate, endDate;
+    switch (period) {
+      case 'weekly':
+        endDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        startDate = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        break;
+      case 'monthly':
+        endDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        startDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+        break;
+      case 'yearly':
+        endDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        startDate = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        return [];
+    }
+    
+    return sessions.filter(session => {
+      const sessionDate = new Date(session.timestamp);
+      return sessionDate >= startDate && sessionDate < endDate;
+    });
+  };
+
   if (isInitialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -331,6 +389,20 @@ const Dashboard = ({ user, onSignOut }) => {
     hourlyProfit: 0,
     averageWinnings: 0
   };
+
+  // Calculate real percentage changes
+  const currentPeriodData = getFilteredData('monthly');
+  const previousPeriodData = getPreviousPeriodData('monthly');
+  
+  const currentWinnings = currentPeriodData.reduce((sum, session) => sum + (session.winnings || 0), 0);
+  const previousWinnings = previousPeriodData.reduce((sum, session) => sum + (session.winnings || 0), 0);
+  const winningsPercentageChange = calculatePercentageChange(currentWinnings, previousWinnings);
+  
+  const currentHours = currentPeriodData.reduce((sum, session) => sum + (session.duration || 0), 0);
+  const previousHours = previousPeriodData.reduce((sum, session) => sum + (session.duration || 0), 0);
+  const currentHourlyRate = currentHours > 0 ? currentWinnings / currentHours : 0;
+  const previousHourlyRate = previousHours > 0 ? previousWinnings / previousHours : 0;
+  const hourlyRatePercentageChange = calculatePercentageChange(currentHourlyRate, previousHourlyRate);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -475,7 +547,9 @@ const Dashboard = ({ user, onSignOut }) => {
               <p className={`text-3xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {formatCurrency(safeStats.totalWinnings)}
               </p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% vs last month</p>
+              <p className={`text-xs mt-1 ${winningsPercentageChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {winningsPercentageChange >= 0 ? '+' : ''}{winningsPercentageChange.toFixed(1)}% vs last month
+              </p>
             </div>
           </div>
 
@@ -499,7 +573,9 @@ const Dashboard = ({ user, onSignOut }) => {
               <p className={`text-3xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
                 {formatCurrency(safeStats.hourlyProfit)}/hr
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">+8.2% vs last month</p>
+              <p className={`text-xs mt-1 ${hourlyRatePercentageChange >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                {hourlyRatePercentageChange >= 0 ? '+' : ''}{hourlyRatePercentageChange.toFixed(1)}% vs last month
+              </p>
             </div>
           </div>
         </div>
@@ -567,7 +643,7 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               
-              <div className={`flex-grow ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
+              <div className={`h-96 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
@@ -661,23 +737,31 @@ const Dashboard = ({ user, onSignOut }) => {
               </div>
             </div>
             <div className="grid grid-cols-3 gap-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">{safeStats.totalSessions}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sessions</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatDuration(safeStats.totalHours)}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Time</p>
-              </div>
-              <div className="text-center">
-                <p className={`text-3xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {formatCurrency(safeStats.totalWinnings)}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Profit</p>
-                {summaryPeriod === 'monthly' && (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% vs last month</p>
-                )}
-              </div>
+              {(() => {
+                const filteredData = getFilteredData(summaryPeriod);
+                const filteredSessions = filteredData.length;
+                const filteredHours = filteredData.reduce((sum, session) => sum + (session.duration || 0), 0);
+                const filteredWinnings = filteredData.reduce((sum, session) => sum + (session.winnings || 0), 0);
+                
+                return (
+                  <>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white">{filteredSessions}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sessions</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatDuration(filteredHours)}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Time</p>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-3xl font-bold ${filteredWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {formatCurrency(filteredWinnings)}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Profit</p>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
