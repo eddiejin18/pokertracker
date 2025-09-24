@@ -688,7 +688,7 @@ const Dashboard = ({ user, onSignOut }) => {
           <div className="lg:col-span-1 flex">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm flex flex-col w-full">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Sessions</h3>
-              <div className="flex-grow overflow-y-auto">
+              <div className="h-96 overflow-y-auto">
                 <SessionList 
                   sessions={recentSessions} 
                   onSessionUpdated={loadData}
