@@ -334,54 +334,55 @@ const Dashboard = ({ user, onSignOut }) => {
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white/70 dark:bg-black/60 backdrop-blur border-b border-black/5 dark:border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-black/10 dark:border-white/10 bg-white dark:bg-white">
-                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain" />
+              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:hidden" />
+                <img src="/invertedicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain hidden dark:block" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-black dark:text-white">Poker Tracker</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Welcome back, {user?.name}</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Poker Tracker</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Welcome back, {user?.name}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="relative inline-flex items-center border border-black/10 dark:border-white/10 rounded-lg p-1">
+              <div className="relative inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-100 dark:bg-gray-800">
                 {/* Sliding highlight */}
                 <div
-                  className={`absolute top-1 bottom-1 left-1 w-1/2 rounded-md transition-transform duration-300 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}
+                  className={`absolute top-1 bottom-1 left-1 w-1/2 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-900 shadow-sm`}
                   style={{ transform: activeView === 'calendar' ? 'translateX(100%)' : 'translateX(0%)' }}
                 />
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`relative z-10 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
-                    activeView === 'dashboard' ? (theme === 'dark' ? 'text-black' : 'text-white') : 'text-black dark:text-white'
+                  className={`relative z-10 px-4 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
+                    activeView === 'dashboard' ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <Home className="h-4 w-4 mr-1 align-middle" />
+                  <Home className="h-4 w-4 mr-2" />
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`relative z-10 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
-                    activeView === 'calendar' ? (theme === 'dark' ? 'text-black' : 'text-white') : 'text-black dark:text-white'
+                  className={`relative z-10 px-4 py-2 rounded-lg text-sm font-semibold transition-colors inline-flex items-center ${
+                    activeView === 'calendar' ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <CalendarIcon className="h-4 w-4 mr-1 align-middle" />
+                  <CalendarIcon className="h-4 w-4 mr-2" />
                   Sessions
                 </button>
               </div>
               <ThemeToggle />
               <button
                 onClick={() => setIsSupportOpen(true)}
-                className="btn"
+                className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Contact Support
               </button>
               <button
                 onClick={onSignOut}
-                className="btn"
+                className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors inline-flex items-center"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
@@ -391,7 +392,7 @@ const Dashboard = ({ user, onSignOut }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black dark:text-white">
+      <div className="max-w-7xl mx-auto px-6 py-8 text-gray-900 dark:text-white">
         {activeView === 'dashboard' && (
           <>
             {/* Filters */}
@@ -463,33 +464,33 @@ const Dashboard = ({ user, onSignOut }) => {
           <>
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Winnings</p>
-              <p className={`text-2xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Winnings</p>
+              <p className={`text-3xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {formatCurrency(safeStats.totalWinnings)}
               </p>
             </div>
           </div>
 
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sessions Played</p>
-              <p className="text-2xl font-bold text-black dark:text-white">{safeStats.totalSessions}</p>
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Sessions Played</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{safeStats.totalSessions}</p>
             </div>
           </div>
 
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hours</p>
-              <p className="text-2xl font-bold text-black dark:text-white">{formatDuration(safeStats.totalHours)}</p>
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Hours</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatDuration(safeStats.totalHours)}</p>
             </div>
           </div>
 
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
+          <div className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${isRefreshing ? 'opacity-70' : ''}`}>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Hourly Profit</p>
-              <p className={`text-2xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Hourly Rate</p>
+              <p className={`text-3xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
                 {formatCurrency(safeStats.hourlyProfit)}/hr
               </p>
             </div>
@@ -499,59 +500,59 @@ const Dashboard = ({ user, onSignOut }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Winnings Chart */}
           <div className="lg:col-span-2">
-            <div className="card p-6">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-black dark:text-white">Winnings Over Time</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Bankroll Growth</h3>
                 <div className="flex items-center space-x-2">
                   {isRefreshing && (
                     <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin text-black dark:text-white" />
                   )}
                   <button
                     onClick={() => setSelectedPeriod('1W')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                       selectedPeriod === '1W'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     1W
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('1M')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                       selectedPeriod === '1M'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     1M
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('3M')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                       selectedPeriod === '3M'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     3M
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('1Y')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                       selectedPeriod === '1Y'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     1Y
                   </button>
                   <button
                     onClick={() => setSelectedPeriod('ALL')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                       selectedPeriod === 'ALL'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     ALL
@@ -599,8 +600,8 @@ const Dashboard = ({ user, onSignOut }) => {
 
           {/* Recent Sessions */}
           <div className="lg:col-span-1">
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Sessions</h3>
               <SessionList 
                 sessions={recentSessions} 
                 onSessionUpdated={loadData}
@@ -610,48 +611,28 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
         </div>
 
-        {/* Additional Stats */}
-        {safeStats.bestSession && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <TrendingUp className="h-5 w-5 text-success-600 mr-2" />
-                Best Session
-              </h3>
-              <div className="space-y-2">
-                <p className="text-2xl font-bold text-black">
-                  {formatCurrency(safeStats.bestSession.winnings)}
+        {/* Weekly Summary */}
+        <div className="mt-8">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-6 shadow-sm">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Weekly Summary</h3>
+            <div className="grid grid-cols-3 gap-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{safeStats.totalSessions}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sessions</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatDuration(safeStats.totalHours)}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Time</p>
+              </div>
+              <div className="text-center">
+                <p className={`text-3xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {formatCurrency(safeStats.totalWinnings)}
                 </p>
-                <p className="text-sm text-gray-600">
-                  {new Date(safeStats.bestSession.timestamp).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Duration: {formatDuration(safeStats.bestSession.duration || 0)}
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Profit</p>
               </div>
             </div>
-
-            {safeStats.worstSession && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <TrendingDown className="h-5 w-5 text-danger-600 mr-2" />
-                  Worst Session
-                </h3>
-                <div className="space-y-2">
-                  <p className="text-2xl font-bold text-gray-600">
-                    {formatCurrency(safeStats.worstSession.winnings)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {new Date(safeStats.worstSession.timestamp).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Duration: {formatDuration(safeStats.worstSession.duration || 0)}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
-        )}
+        </div>
           </>
         )}
       </div>
