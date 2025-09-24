@@ -507,10 +507,10 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Winnings Chart */}
-          <div className="lg:col-span-2">
-            <div className="card p-6">
+          <div className="flex-1">
+            <div className="card p-6 h-full flex flex-col">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-black dark:text-white">Profit Over Time</h3>
                 <div className="flex items-center space-x-2">
@@ -570,7 +570,7 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               
-              <div className={`h-80 pb-4 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
+              <div className={`flex-1 min-h-0 pb-4 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
@@ -609,10 +609,10 @@ const Dashboard = ({ user, onSignOut }) => {
           </div>
 
           {/* Recent Sessions */}
-          <div className="lg:col-span-1">
-            <div className="card p-6">
+          <div className="w-full lg:w-80">
+            <div className="card p-6 h-full flex flex-col">
               <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
-              <div className="max-h-80 overflow-y-auto">
+              <div className="flex-1 min-h-0 overflow-y-auto">
                 <SessionList 
                   sessions={recentSessions} 
                   onSessionUpdated={loadData}
