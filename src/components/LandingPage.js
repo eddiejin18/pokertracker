@@ -38,7 +38,7 @@ const LandingPage = ({ onGetStarted }) => {
             Free poker tracking for serious players
           </div>
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            The poker tracker built for <span className="text-gray-500 dark:text-gray-400">serious players</span>
+            The poker tracker built for <span className="text-gray-500 dark:text-gray-400">winning</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto font-normal leading-relaxed animate-fade-in" style={{ animationDelay: '0.5s' }}>
             Track your poker sessions, manage your bankroll, and improve your game with professional analytics. 
