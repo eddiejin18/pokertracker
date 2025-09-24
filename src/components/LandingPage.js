@@ -322,52 +322,20 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
       </div>
 
-      {/* Social Proof Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '1.9s' }}>
-            Why players choose our tracker
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '2.0s' }}>
-            Simple, clean, and designed specifically for poker players who want to improve their game
-          </p>
-        </div>
-
-
-        <div className="text-center animate-fade-in" style={{ animationDelay: '2.1s' }}>
-          <div className="inline-flex items-center space-x-8 text-gray-500 dark:text-gray-400">
-            <div className="flex items-center space-x-2">
-              <Users className="w-5 h-5" />
-              <span className="font-semibold">Free</span>
-              <span>Forever</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5" />
-              <span className="font-semibold">Easy</span>
-              <span>Setup</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5" />
-              <span className="font-semibold">No</span>
-              <span>Credit Card</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* FAQ Section */}
       <div className="max-w-4xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.2s' }}>
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '1.9s' }}>
             Frequently Asked Questions
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in" style={{ animationDelay: '2.3s' }}>
+          <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in" style={{ animationDelay: '2.0s' }}>
             Everything you need to know about our free poker tracker
           </p>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.4s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.1s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Is this poker tracker really free?
             </h3>
@@ -376,7 +344,7 @@ const LandingPage = ({ onGetStarted }) => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.5s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.2s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               How is this better than Excel spreadsheets?
             </h3>
@@ -385,7 +353,7 @@ const LandingPage = ({ onGetStarted }) => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.6s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.3s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Can I track sessions from multiple sites?
             </h3>
@@ -394,7 +362,7 @@ const LandingPage = ({ onGetStarted }) => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.7s' }}>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.4s' }}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               What poker statistics can I track?
             </h3>
@@ -408,13 +376,13 @@ const LandingPage = ({ onGetStarted }) => {
       {/* CTA Section */}
       <div className="bg-gray-50 dark:bg-gray-900 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.8s' }}>
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.5s' }}>
             Ready to improve your poker game?
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 animate-fade-in" style={{ animationDelay: '2.9s' }}>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 animate-fade-in" style={{ animationDelay: '2.6s' }}>
             Start tracking your sessions today with the best free poker tracker.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '3.0s' }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '2.7s' }}>
             <button
               onClick={onGetStarted}
               className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-lg"
@@ -439,7 +407,7 @@ const LandingPage = ({ onGetStarted }) => {
       {/* Footer */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center animate-fade-in" style={{ animationDelay: '3.1s' }}>
+          <div className="text-center animate-fade-in" style={{ animationDelay: '2.8s' }}>
             <div className="flex items-center justify-center space-x-3 mb-6">
               <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-white">
                 <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:invert" />
@@ -458,7 +426,7 @@ const LandingPage = ({ onGetStarted }) => {
             </button>
           </div>
           
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-12 animate-fade-in" style={{ animationDelay: '3.2s' }}>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-12 animate-fade-in" style={{ animationDelay: '2.9s' }}>
             <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
               © 2025 Poker Tracker. All rights reserved.
             </div>
