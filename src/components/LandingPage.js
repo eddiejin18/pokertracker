@@ -86,13 +86,9 @@ const LandingPage = ({ onGetStarted }) => {
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Session Recording
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
               Record every poker session with wins, losses, and time played. Get detailed insights into your performance across all game types and stakes.
             </p>
-            <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 font-medium">
-              <span>Learn more</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </div>
           </div>
 
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '1.0s' }}>
@@ -102,13 +98,9 @@ const LandingPage = ({ onGetStarted }) => {
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Bankroll Management
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
               Monitor your bankroll growth and track your profit over time. See your hourly rates and performance trends with clear, actionable insights.
             </p>
-            <div className="flex items-center text-sm text-green-600 dark:text-green-400 font-medium">
-              <span>Learn more</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </div>
           </div>
 
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '1.1s' }}>
@@ -118,13 +110,9 @@ const LandingPage = ({ onGetStarted }) => {
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Smart Analytics
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
               Modern interface that's easier than Excel spreadsheets. Clean charts, automatic calculations, and professional analytics that help you improve your game.
             </p>
-            <div className="flex items-center text-sm text-purple-600 dark:text-purple-400 font-medium">
-              <span>Learn more</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </div>
           </div>
         </div>
       </div>
@@ -197,7 +185,10 @@ const LandingPage = ({ onGetStarted }) => {
               Record every poker session — cash games, tournaments, live games, online poker — in a single view. 
               Get instant insights into your performance across all game types.
             </p>
-            <button className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2">
+            <button 
+              onClick={onGetStarted}
+              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2"
+            >
               <span>Learn about Session Tracking</span>
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -240,7 +231,10 @@ const LandingPage = ({ onGetStarted }) => {
               See your bankroll growth, hourly rates, and performance trends with professional analytics. 
               Much better than Excel spreadsheets for tracking your poker results.
             </p>
-            <button className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2">
+            <button 
+              onClick={onGetStarted}
+              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2"
+            >
               <span>Learn about Analytics</span>
               <ArrowRight className="w-4 h-4" />
             </button>
