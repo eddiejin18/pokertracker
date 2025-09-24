@@ -430,8 +430,8 @@ const Dashboard = ({ user, onSignOut }) => {
                 <div
                   className="absolute top-1 bottom-1 bg-white dark:bg-gray-900 rounded-md shadow-sm transition-all duration-300 ease-out"
                   style={{
-                    left: activeView === 'dashboard' ? '4px' : 'calc(50% + 2px)',
-                    width: 'calc(50% - 4px)',
+                    left: activeView === 'dashboard' ? '4px' : 'calc(50% + 4px)',
+                    width: 'calc(50% - 6px)',
                   }}
                 />
                 <button
