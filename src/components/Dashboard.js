@@ -448,7 +448,7 @@ const Dashboard = ({ user, onSignOut }) => {
               <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 w-24 ${
                     activeView === 'dashboard'
                       ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -459,7 +459,7 @@ const Dashboard = ({ user, onSignOut }) => {
                 </button>
                 <button
                   onClick={() => setActiveView('calendar')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 w-24 ${
                     activeView === 'calendar'
                       ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
