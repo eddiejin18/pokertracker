@@ -578,6 +578,7 @@ const Dashboard = ({ user, onSignOut }) => {
                       dataKey="period" 
                       stroke={theme === 'dark' ? '#9ca3af' : '#666'}
                       fontSize={12}
+                      tickMargin={8}
                     />
                     <YAxis 
                       stroke={theme === 'dark' ? '#9ca3af' : '#666'}
