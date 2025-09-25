@@ -620,6 +620,16 @@ const Dashboard = ({ user, onSignOut }) => {
                 onTouchMove={(e) => {
                   e.stopPropagation();
                 }}
+                onScroll={(e) => {
+                  e.stopPropagation();
+                }}
+                onTouchStart={(e) => {
+                  e.stopPropagation();
+                }}
+                onTouchEnd={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{ touchAction: 'pan-y' }}
               >
                 <SessionList 
                   sessions={recentSessions} 
