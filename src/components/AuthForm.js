@@ -46,43 +46,43 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
       {showErrorToast && (
         <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-md shadow-lg z-50">
           {error}
         </div>
       )}
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 shadow-sm">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-soft">
           {onBackToHome && (
             <button
               onClick={onBackToHome}
-              className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               <span className="text-sm font-medium">Back to home</span>
             </button>
           )}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Poker Tracker</h1>
-            <p className="text-gray-600 dark:text-gray-300 text-sm">
+            <h1 className="text-3xl font-semibold tracking-tight text-charcoal mb-2">Poker Tracker</h1>
+            <p className="text-stone-600 text-sm">
               {isLogin ? 'Sign in to your account' : 'Create your account'}
             </p>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-2 text-sm text-gray-500">
               A free and intuitive UI to track your poker sessions and profit overtime.
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-              <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-600 text-sm font-medium">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Name
                 </label>
                 <input
@@ -91,14 +91,14 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required={!isLogin}
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-200 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-400 transition-all"
                   placeholder="Your name"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Email
               </label>
               <input
@@ -107,13 +107,13 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-400 transition-all"
                 placeholder="your@email.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -123,7 +123,7 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 pr-12 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-400 transition-all"
                   placeholder="Password"
                 />
                 <button
@@ -132,9 +132,9 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
                   className="absolute inset-y-0 right-0 pr-4 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   )}
                 </button>
               </div>
@@ -147,9 +147,9 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
                   name="rememberMe"
                   checked={formData.rememberMe}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 rounded focus:ring-gray-900 dark:focus:ring-white"
+                  className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
                 />
-                <label className="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                <label className="ml-3 text-sm text-gray-700">
                   Remember me for 30 days
                 </label>
               </div>
@@ -158,7 +158,7 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center px-6 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+              className="w-full flex items-center justify-center px-6 py-4 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
             >
               {isLoading ? (
                 <span className="mr-2"><LoadingDots /></span>
@@ -175,13 +175,13 @@ const AuthForm = ({ onLogin, onRegister, isLoading, error, onBackToHome }) => {
             <button
               type="button"
               onClick={toggleMode}
-              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </button>
           </div>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-6">
+          <p className="text-xs text-gray-500 text-center mt-6">
             Your data is stored securely in the cloud
           </p>
         </div>

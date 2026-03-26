@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, DollarSign, MapPin, Calendar, Clock, Gamepad2, Users, FileText } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, DollarSign, MapPin, Calendar, Clock, Gamepad2, FileText } from 'lucide-react';
 import ApiService from '../services/api';
 
 const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSession }) => {
@@ -25,6 +25,29 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
   const [casinoSuggestions, setCasinoSuggestions] = useState([]);
   const [showCasinoSuggestions, setShowCasinoSuggestions] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const dateInputRef = useRef(null);
+
+  const openSessionDatePicker = () => {
+    const el = dateInputRef.current;
+    if (!el) return;
+    try {
+      if (typeof el.showPicker === 'function') {
+        const result = el.showPicker();
+        if (result && typeof result.catch === 'function') {
+          result.catch(() => {
+            el.focus();
+            el.click();
+          });
+        }
+      } else {
+        el.focus();
+        el.click();
+      }
+    } catch {
+      el.focus();
+      el.click();
+    }
+  };
 
   const pokerVariations = [
     'No Limit Hold\'em',
@@ -378,7 +401,10 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
       setFormData({
         gameType: editingSession.game_type || 'No Limit Hold\'em',
         blinds: editingSession.blinds || '',
-        location: editingSession.location_type === 'home' ? editingSession.location || '' : '',
+        location:
+          editingSession.location_type === 'home' || editingSession.location_type === 'online'
+            ? editingSession.location || ''
+            : '',
         locationType: editingSession.location_type || 'home',
         casinoName: editingSession.location_type === 'casino' ? editingSession.location || '' : '',
         buyIn: editingSession.buy_in ? editingSession.buy_in.toString() : '',
@@ -474,7 +500,8 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
       const sessionData = {
         gameType: formData.gameType,
         blinds: formData.blinds,
-        location: formData.locationType === 'casino' ? formData.casinoName : formData.location,
+        location:
+          formData.locationType === 'casino' ? formData.casinoName : formData.location,
         locationType: formData.locationType,
         buyIn: parseFloat(formData.buyIn) || 0,
         endAmount: parseFloat(formData.endAmount) || 0,
@@ -527,18 +554,18 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
       onMouseDown={handleClose}
     >
       <div
-        className={`bg-white dark:bg-black rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-black/10 dark:border-white/30 transition-all duration-200 ${
+        className={`bg-white rounded-xl shadow-luxury w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-100 transition-all duration-200 ${
           isClosing ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-black/10 dark:border-white/30">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-gray-900">
               {editingSession ? 'Edit Poker Session' : 'Add Poker Session'}
             </h2>
             {selectedDate && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 {selectedDate.toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   year: 'numeric', 
@@ -550,7 +577,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="h-6 w-6" />
           </button>
@@ -560,78 +587,125 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Game Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Gamepad2 className="h-4 w-4 inline mr-1" />
                 Poker Variation
               </label>
-              <select
-                name="gameType"
-                value={formData.gameType}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white"
-                required
-              >
-                {pokerVariations.map(variation => (
-                  <option key={variation} value={variation}>{variation}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  name="gameType"
+                  value={formData.gameType}
+                  onChange={handleInputChange}
+                  className="w-full appearance-none pl-3 pr-11 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900"
+                  required
+                >
+                  {pokerVariations.map(variation => (
+                    <option key={variation} value={variation}>{variation}</option>
+                  ))}
+                </select>
+                <svg
+                  className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
             </div>
 
             {/* Blinds/Stakes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Blinds/Stakes
               </label>
-              <select
-                name="blinds"
-                value={formData.blinds}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white"
-              >
-                <option value="">Select blinds</option>
-                {commonBlinds.map(blind => (
-                  <option key={blind} value={blind}>{blind}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  name="blinds"
+                  value={formData.blinds}
+                  onChange={handleInputChange}
+                  className="w-full appearance-none pl-3 pr-11 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900"
+                >
+                  <option value="">Select blinds</option>
+                  {commonBlinds.map(blind => (
+                    <option key={blind} value={blind}>{blind}</option>
+                  ))}
+                </select>
+                <svg
+                  className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
             </div>
           </div>
 
           {/* Location Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
               <MapPin className="h-4 w-4 inline mr-1" />
               Location Type
             </label>
-            <div className="flex space-x-4">
-              <label className="flex items-center text-gray-700 dark:text-gray-300">
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <label className="flex items-center text-gray-700">
                 <input
                   type="radio"
                   name="locationType"
                   value="home"
                   checked={formData.locationType === 'home'}
                   onChange={handleInputChange}
-                  className="mr-2 text-blue-600 dark:text-blue-400"
+                  className="mr-2 text-blue-600"
                 />
                 Home Game
               </label>
-              <label className="flex items-center text-gray-700 dark:text-gray-300">
+              <label className="flex items-center text-gray-700">
                 <input
                   type="radio"
                   name="locationType"
                   value="casino"
                   checked={formData.locationType === 'casino'}
                   onChange={handleInputChange}
-                  className="mr-2 text-blue-600 dark:text-blue-400"
+                  className="mr-2 text-blue-600"
                 />
                 Casino
+              </label>
+              <label className="flex items-center text-gray-700">
+                <input
+                  type="radio"
+                  name="locationType"
+                  value="online"
+                  checked={formData.locationType === 'online'}
+                  onChange={handleInputChange}
+                  className="mr-2 text-blue-600"
+                />
+                Online
               </label>
             </div>
           </div>
 
           {/* Location Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {formData.locationType === 'casino' ? 'Casino Name' : 'Location'}
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {formData.locationType === 'casino'
+                ? 'Casino Name'
+                : formData.locationType === 'online'
+                  ? 'Site / platform'
+                  : 'Location'}
             </label>
             {formData.locationType === 'casino' ? (
               <div className="relative">
@@ -641,13 +715,13 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                   value={formData.casinoName}
                   onChange={handleInputChange}
                   placeholder="Search for casino..."
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
                 />
                 {showCasinoSuggestions && Object.keys(casinoSuggestions).length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-black border border-gray-300 dark:border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {Object.entries(casinoSuggestions).map(([city, casinos]) => (
                       <div key={city}>
-                        <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-white/10">
+                        <div className="px-3 py-2 bg-gray-100 text-xs font-semibold text-gray-600 border-b border-gray-200">
                           {city}
                         </div>
                         {casinos.map((casino, index) => (
@@ -655,7 +729,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                             key={`${city}-${index}`}
                             type="button"
                             onClick={() => handleCasinoSelect(casino)}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-900 dark:text-white"
+                            className="w-full px-3 py-2 text-left hover:bg-gray-100 text-sm text-gray-900"
                           >
                             {casino}
                           </button>
@@ -671,46 +745,59 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                placeholder="e.g., John's house, Online, etc."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                placeholder={
+                  formData.locationType === 'online'
+                    ? 'e.g. PokerStars, GGPoker, 888poker'
+                    : "e.g. John's house, private game"
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
               />
             )}
           </div>
 
-          {/* Session Date - Only show when editing or as optional field */}
-          {(editingSession || formData.sessionDate) && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <Calendar className="h-4 w-4 inline mr-1" />
-                Session Date
-              </label>
-              <input
-                type="date"
-                name="sessionDate"
-                value={formData.sessionDate}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white"
-              />
+          {/* Session date — click row to open system date picker (reliable vs opacity overlay) */}
+          <div>
+            <div className="block text-sm font-medium text-gray-700 mb-2">
+              <Calendar className="h-4 w-4 inline mr-1" />
+              Session date
             </div>
-          )}
-
-          {/* Show date field button for new sessions */}
-          {!editingSession && !formData.sessionDate && (
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, sessionDate: selectedDate ? formatLocalDate(selectedDate) : formatLocalDate(new Date()) }))}
-                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white underline"
-              >
-                Change session date
-              </button>
-            </div>
-          )}
+            <input
+              ref={dateInputRef}
+              id="session-date-input"
+              type="date"
+              name="sessionDate"
+              value={formData.sessionDate}
+              onChange={handleInputChange}
+              className="sr-only"
+              tabIndex={-1}
+            />
+            <button
+              type="button"
+              onClick={openSessionDatePicker}
+              aria-label="Open calendar to choose session date"
+              className="w-full flex items-center justify-between gap-2 px-3 py-2.5 border border-gray-300 rounded-lg bg-white text-left text-sm text-gray-900 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:border-gray-500 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2 min-w-0">
+                <Calendar className="h-4 w-4 text-gray-400 shrink-0" strokeWidth={1.5} />
+                <span>
+                  {formData.sessionDate
+                    ? new Date(`${formData.sessionDate}T12:00:00`).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })
+                    : 'Choose date'}
+                </span>
+              </span>
+              <span className="text-[11px] font-medium text-blue-600 shrink-0">Edit</span>
+            </button>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Buy-in */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <DollarSign className="h-4 w-4 inline mr-1" />
                 Buy-in Amount ($)
               </label>
@@ -721,14 +808,14 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                 value={formData.buyIn}
                 onChange={handleInputChange}
                 placeholder="0.00"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
                 required
               />
             </div>
 
             {/* End Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 End Amount ($)
               </label>
               <input
@@ -738,14 +825,14 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                 value={formData.endAmount}
                 onChange={handleInputChange}
                 placeholder="0.00"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
                 required
               />
             </div>
 
             {/* Duration */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Clock className="h-4 w-4 inline mr-1" />
                 Duration (hours)
               </label>
@@ -756,7 +843,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                 value={formData.duration}
                 onChange={handleInputChange}
                 placeholder="0.00"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
                 required
               />
             </div>
@@ -765,12 +852,12 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
           {/* Profit/Loss Display */}
           {formData.buyIn && formData.endAmount && (
             <div className={`p-4 rounded-lg ${
-              winnings >= 0 ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+              winnings >= 0 ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
             }`}>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Session Result:</span>
+                <span className="text-sm font-medium text-gray-700">Session Result:</span>
                 <span className={`text-lg font-bold ${
-                  winnings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                  winnings >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
                   {winnings >= 0 ? '+' : ''}${winnings.toFixed(2)}
                 </span>
@@ -780,7 +867,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               <FileText className="h-4 w-4 inline mr-1" />
               Notes
             </label>
@@ -790,7 +877,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
               onChange={handleInputChange}
               rows={3}
               placeholder="Notable hands, observations, or any other notes..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none bg-white dark:bg-black text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 resize-none bg-white text-gray-900 placeholder-gray-500"
             />
           </div>
 
@@ -799,14 +886,14 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 px-4 py-2 bg-charcoal text-white rounded-lg hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Saving...' : (editingSession ? 'Update Session' : 'Save Session')}
             </button>

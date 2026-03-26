@@ -89,7 +89,7 @@ const SessionModal = ({ isOpen, onClose, onSessionAdded }) => {
               value={formData.winnings}
               onChange={handleInputChange}
               placeholder="Enter amount (negative for losses)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500"
               required
             />
           </div>
@@ -107,7 +107,7 @@ const SessionModal = ({ isOpen, onClose, onSessionAdded }) => {
               value={formData.duration}
               onChange={handleInputChange}
               placeholder="e.g., 2.5 for 2 hours 30 minutes"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500"
               required
             />
           </div>
@@ -121,7 +121,7 @@ const SessionModal = ({ isOpen, onClose, onSessionAdded }) => {
               name="gameType"
               value={formData.gameType}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500"
             >
               {gameTypes.map(type => (
                 <option key={type} value={type}>{type}</option>
@@ -140,7 +140,7 @@ const SessionModal = ({ isOpen, onClose, onSessionAdded }) => {
               value={formData.stakes}
               onChange={handleInputChange}
               placeholder="e.g., $1/$2, $10 MTT, $5 SNG"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500"
             />
           </div>
 
@@ -156,7 +156,7 @@ const SessionModal = ({ isOpen, onClose, onSessionAdded }) => {
               value={formData.location}
               onChange={handleInputChange}
               placeholder="e.g., Online, Casino Name, Home Game"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500"
             />
           </div>
 
@@ -171,7 +171,7 @@ const SessionModal = ({ isOpen, onClose, onSessionAdded }) => {
               onChange={handleInputChange}
               rows={3}
               placeholder="Any additional notes about the session..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 resize-none"
             />
           </div>
 

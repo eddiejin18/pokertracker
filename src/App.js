@@ -1,35 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import ApiService from './services/api';
 import { ToastProvider } from './components/ToastProvider';
-import { ThemeProvider } from './components/ThemeProvider';
 import AuthForm from './components/AuthForm';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import SEOContent from './components/SEOContent';
 import './App.css';
-import LoadingDots from './components/LoadingDots';
+import LoadingPercentScreen from './components/LoadingPercentScreen';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadPercent, setLoadPercent] = useState(0);
+  const loadProgressTimerRef = useRef(null);
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [initialGroupId, setInitialGroupId] = useState(null);
+  const pendingInviteCodeRef = useRef(null);
+  const [hasPendingInvite, setHasPendingInvite] = useState(false);
 
   useEffect(() => {
-    // Check if user is already authenticated
+    // Invite deep-link: ?invite=CODE
+    const params = new URLSearchParams(window.location.search || '');
+    const invite = (params.get('invite') || '').trim().toUpperCase();
+    if (invite) {
+      pendingInviteCodeRef.current = invite;
+      setHasPendingInvite(true);
+      setShowLandingPage(false); // Send invited users straight to auth
+    }
+
+    setLoadPercent(0);
+    const started = performance.now();
+    const rampMs = 720;
+    const capBeforeDone = 88;
+
+    loadProgressTimerRef.current = setInterval(() => {
+      const elapsed = performance.now() - started;
+      const t = Math.min(1, elapsed / rampMs);
+      const eased = 1 - (1 - t) * (1 - t);
+      setLoadPercent(Math.min(capBeforeDone, Math.round(eased * capBeforeDone)));
+    }, 24);
+
+    const finishLoad = () => {
+      if (loadProgressTimerRef.current) {
+        clearInterval(loadProgressTimerRef.current);
+        loadProgressTimerRef.current = null;
+      }
+      setLoadPercent(100);
+      setTimeout(() => setIsLoading(false), 220);
+    };
+
     const checkAuth = async () => {
       const userData = localStorage.getItem('pokerTracker_user') || sessionStorage.getItem('pokerTracker_user');
       if (userData) {
         try {
-          // Test if token is still valid by making a request
           await ApiService.getSessions();
           setUser(JSON.parse(userData));
           setIsAuthenticated(true);
-          setShowLandingPage(false); // Skip landing page if already authenticated
+          setShowLandingPage(false);
+
+          // If someone opened an invite link while already logged in, join immediately.
+          const inviteCode = pendingInviteCodeRef.current;
+          if (inviteCode) {
+            try {
+              const joined = await ApiService.joinGroup(inviteCode);
+              setInitialGroupId(joined.id);
+            } catch (e) {
+              // Don't break login/session if invite join fails (already joined, bad code, etc.)
+              console.log('Invite join failed:', e?.message || e);
+            } finally {
+              pendingInviteCodeRef.current = null;
+              setHasPendingInvite(false);
+              // Remove invite from URL to avoid re-joining on refresh
+              const url = new URL(window.location.href);
+              url.searchParams.delete('invite');
+              window.history.replaceState({}, '', url.toString());
+            }
+          }
         } catch (error) {
-          // Token is invalid, clear it
           console.log('Token expired, clearing auth data');
           localStorage.removeItem('pokerTracker_token');
           localStorage.removeItem('pokerTracker_user');
@@ -37,10 +87,16 @@ function App() {
           sessionStorage.removeItem('pokerTracker_user');
         }
       }
-      setIsLoading(false);
+      finishLoad();
     };
 
     checkAuth();
+
+    return () => {
+      if (loadProgressTimerRef.current) {
+        clearInterval(loadProgressTimerRef.current);
+      }
+    };
   }, []);
 
   const handleLogin = async (email, password, rememberMe) => {
@@ -59,6 +115,23 @@ function App() {
       } else {
         sessionStorage.setItem('pokerTracker_user', userJson);
         localStorage.removeItem('pokerTracker_user');
+      }
+
+      // If user came from an invite link, join automatically after auth.
+      const inviteCode = pendingInviteCodeRef.current;
+      if (inviteCode) {
+        try {
+          const joined = await ApiService.joinGroup(inviteCode);
+          setInitialGroupId(joined.id);
+        } catch (e) {
+          console.log('Invite join failed:', e?.message || e);
+        } finally {
+          pendingInviteCodeRef.current = null;
+          setHasPendingInvite(false);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('invite');
+          window.history.replaceState({}, '', url.toString());
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -80,6 +153,23 @@ function App() {
       // Default to persistent on register
       localStorage.setItem('pokerTracker_user', JSON.stringify(data.user));
       sessionStorage.removeItem('pokerTracker_user');
+
+      // If user came from an invite link, join automatically after auth.
+      const inviteCode = pendingInviteCodeRef.current;
+      if (inviteCode) {
+        try {
+          const joined = await ApiService.joinGroup(inviteCode);
+          setInitialGroupId(joined.id);
+        } catch (e) {
+          console.log('Invite join failed:', e?.message || e);
+        } finally {
+          pendingInviteCodeRef.current = null;
+          setHasPendingInvite(false);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('invite');
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
     } catch (error) {
       console.error('Registration error:', error);
       setError(error.message || 'Registration failed. Please try again.');
@@ -106,51 +196,41 @@ function App() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-        <LoadingDots />
-      </div>
-    );
+    return <LoadingPercentScreen percent={loadPercent} />;
   }
 
   if (!isAuthenticated) {
     if (showLandingPage) {
       return (
-        <ThemeProvider>
-          <ToastProvider>
-            <SEOContent />
-            <LandingPage onGetStarted={handleGetStarted} />
-          </ToastProvider>
-        </ThemeProvider>
+        <ToastProvider>
+          <SEOContent />
+          <LandingPage onGetStarted={handleGetStarted} />
+        </ToastProvider>
       );
     }
     
     return (
-      <ThemeProvider>
-        <ToastProvider>
-          <SEOContent />
-          <AuthForm
-            onLogin={handleLogin}
-            onRegister={handleRegister}
-            isLoading={isLoading}
-            error={error}
-            onBackToHome={handleBackToHome}
-          />
-        </ToastProvider>
-      </ThemeProvider>
+      <ToastProvider>
+        <SEOContent />
+        <AuthForm
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          isLoading={isLoading}
+          error={error}
+          onBackToHome={handleBackToHome}
+        />
+      </ToastProvider>
     );
   }
 
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <SEOContent />
-        <div className="min-h-screen bg-white dark:bg-black">
-          <Dashboard user={user} onSignOut={handleSignOut} />
-        </div>
-        <Analytics />
-      </ToastProvider>
-    </ThemeProvider>
+    <ToastProvider>
+      <SEOContent />
+      <div className="min-h-screen bg-canvas">
+        <Dashboard user={user} onSignOut={handleSignOut} initialGroupId={initialGroupId} />
+      </div>
+      <Analytics />
+    </ToastProvider>
   );
 }
 

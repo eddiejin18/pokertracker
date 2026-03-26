@@ -1,494 +1,664 @@
-import React, { useState } from 'react';
-import { ArrowRight, Calendar, DollarSign, BarChart3, CheckCircle, Star, Users, TrendingUp, Clock, Target, Zap, Mail } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+import React, { useState, useCallback } from 'react';
+import {
+  ArrowRight,
+  Calendar,
+  DollarSign,
+  BarChart3,
+  CheckCircle,
+  Mail,
+  LineChart,
+  HelpCircle,
+  Users,
+} from 'lucide-react';
 import SupportModal from './SupportModal';
+
+const navItems = [
+  { id: 'section-sessions', label: 'Sessions', icon: Calendar },
+  { id: 'section-analytics', label: 'Analytics', icon: LineChart },
+  { id: 'section-groups', label: 'Groups', icon: Users },
+];
 
 const LandingPage = ({ onGetStarted }) => {
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState('section-sessions');
+
+  const scrollToSection = useCallback((id) => {
+    // Only switch the hero preview for the 3 preview tabs.
+    if (id === 'section-sessions' || id === 'section-analytics' || id === 'section-groups') {
+      setActiveNav(id);
+    }
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  // Preview tabs: update hero preview without scrolling the page.
+  const setPreviewTab = useCallback((id) => {
+    setActiveNav(id);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      {/* Navigation */}
-      <nav className="relative px-6 py-6 border-b border-gray-100 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
-              <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain dark:hidden" />
-              <img src="/invertedicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain hidden dark:block" />
-            </div>
-            <span className="text-xl font-semibold text-gray-900 dark:text-white">Poker Tracker</span>
+    <div className="min-h-screen bg-mist text-charcoal antialiased">
+      {/* Top bar */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/pokericon.png" alt="" className="h-9 w-9 object-contain" />
+            <span className="text-[15px] font-semibold tracking-tight text-charcoal">Poker Tracker</span>
           </div>
-          <div className="flex items-center space-x-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <ThemeToggle />
+          <button
+            type="button"
+            onClick={onGetStarted}
+            className="inline-flex items-center gap-2 rounded-full border border-charcoal/15 bg-charcoal px-5 py-2.5 text-[13px] font-medium text-white tracking-tight shadow-luxury-sm transition hover:bg-charcoal/90"
+          >
+            Get started
+            <ArrowRight className="h-3.5 w-3.5 opacity-80" strokeWidth={2} />
+          </button>
+        </div>
+      </header>
+
+      {/* Hero: sidebar + feature card */}
+      <div id="hero" className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-12 lg:pt-16 pb-20 lg:pb-28 scroll-mt-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Sidebar navigation */}
+          <aside className="lg:col-span-4 xl:col-span-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-8">
+              Our product
+            </p>
+            <nav className="space-y-1" aria-label="Product sections">
+              {navItems.map(({ id, label, icon: Icon }) => {
+                const active = activeNav === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setPreviewTab(id)}
+                    className={`w-full flex items-center gap-4 text-left py-2.5 rounded-xl transition-all duration-300 ${
+                      active ? '' : 'hover:opacity-80'
+                    }`}
+                  >
+                    <span
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 ${
+                        active
+                          ? 'bg-gray-100 border-gray-200 text-charcoal'
+                          : 'bg-white border-gray-200 text-charcoal shadow-sm'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" strokeWidth={1.5} />
+                    </span>
+                    <span
+                      className={`text-[15px] font-medium tracking-tight rounded-full px-4 py-2 transition-all duration-300 ${
+                        active
+                          ? 'bg-white text-charcoal shadow-soft border border-gray-200'
+                          : 'text-gray-600'
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
+
+          {/* Hero card */}
+          <div className="lg:col-span-8 xl:col-span-9">
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-gray-100 bg-white shadow-soft min-h-[290px] lg:min-h-[340px]">
+              <div className="absolute inset-0 bg-gray-50/80" />
+              <div className="relative p-4 lg:p-7 pt-5 lg:pt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="h-2 w-2 rounded-full bg-gray-300" />
+                  <span className="h-2 w-2 rounded-full bg-gray-300" />
+                  <span className="h-2 w-2 rounded-full bg-gray-300" />
+                </div>
+
+                {/* Variant-specific mini preview (no scrolling; changes with the active tab) */}
+                {activeNav === 'section-analytics' && (
+                  <>
+                    <div className="grid sm:grid-cols-3 gap-4 w-full mb-6">
+                      {[
+                        { k: 'This month', v: '+$2,450' },
+                        { k: 'Sessions', v: '24' },
+                        { k: 'Hourly', v: '$48' },
+                      ].map((row) => (
+                        <div
+                          key={row.k}
+                          className="rounded-xl border border-gray-100 bg-white px-4 py-3.5 shadow-sm"
+                        >
+                          <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1">
+                            {row.k}
+                          </p>
+                          <p className="text-lg font-semibold text-charcoal tracking-tight tabular-nums">
+                            {row.v}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="h-px w-full bg-gray-100 mb-5" />
+                    <div className="flex items-end gap-1.5 h-24 w-full">
+                      {[40, 55, 45, 70, 62, 88, 75, 92, 68, 95].map((h, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-t-sm bg-violet-200/90"
+                          style={{ height: `${h}%` }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {activeNav === 'section-sessions' && (
+                  <>
+                    <div className="w-full mb-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                          Recent sessions
+                        </p>
+                        <p className="text-[11px] text-gray-400">Sample data</p>
+                      </div>
+
+                      <div className="rounded-xl border border-gray-100 bg-white px-4 py-3.5 shadow-sm">
+                        <div className="grid grid-cols-12 gap-2 text-[11px] uppercase tracking-wider text-gray-500 mb-2">
+                          <span className="col-span-3">Date</span>
+                          <span className="col-span-7">Session</span>
+                          <span className="col-span-2 text-right">Profit</span>
+                        </div>
+
+                        <div className="divide-y divide-gray-100">
+                          {[
+                            {
+                              date: 'Today',
+                              game: "No Limit Hold'em",
+                              stake: '$1/$2',
+                              loc: 'Online · PokerStars',
+                              profit: '+$150',
+                              profitPos: true,
+                            },
+                            {
+                              date: 'Yesterday',
+                              game: "Limit Hold'em",
+                              stake: '$0.50/$1',
+                              loc: "Home · John's house",
+                              profit: '-$75',
+                              profitPos: false,
+                            },
+                            {
+                              date: '2 days ago',
+                              game: 'No Limit Omaha',
+                              stake: '$2/$5',
+                              loc: 'Casino · Aria Resort',
+                              profit: '+$300',
+                              profitPos: true,
+                            },
+                          ].map((r) => (
+                            <div
+                              key={`${r.date}-${r.game}-${r.profit}`}
+                              className="grid grid-cols-12 gap-2 items-center py-2"
+                            >
+                              <div className="col-span-3 text-[13px] font-medium text-charcoal tabular-nums truncate">
+                                {r.date}
+                              </div>
+
+                              <div className="col-span-7 min-w-0">
+                                <p className="text-[13px] font-semibold text-charcoal truncate">
+                                  {r.game} · {r.stake}
+                                </p>
+                                <p className="text-[12px] text-gray-500 mt-0.5 truncate">{r.loc}</p>
+                              </div>
+
+                              <div
+                                className={`col-span-2 text-[13px] font-semibold tabular-nums text-right ${
+                                  r.profitPos ? 'text-emerald-700' : 'text-rose-700'
+                                }`}
+                              >
+                                {r.profit}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {activeNav === 'section-groups' && (
+                  <>
+                    <div className="grid sm:grid-cols-3 gap-4 w-full mb-6">
+                      {[
+                        { k: 'Group', v: '4 friends' },
+                        { k: 'Your rank', v: '#3' },
+                        { k: 'Hourly', v: '$41' },
+                      ].map((row) => (
+                        <div
+                          key={row.k}
+                          className="rounded-xl border border-gray-100 bg-white px-4 py-3.5 shadow-sm"
+                        >
+                          <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1">
+                            {row.k}
+                          </p>
+                          <p className="text-lg font-semibold text-charcoal tracking-tight tabular-nums">
+                            {row.v}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="h-px w-full bg-gray-100 mb-4" />
+                    <div className="w-full space-y-2">
+                      {[
+                        { rank: 1, name: 'Alex', total: '+$1,240', hourly: '$52' },
+                        { rank: 2, name: 'Marvin', total: '+$980', hourly: '$41' },
+                        { rank: 3, name: 'You', total: '+$760', hourly: '$34', you: true },
+                        { rank: 4, name: 'Jordan', total: '+$540', hourly: '$22' },
+                      ].map((r, idx) => (
+                        <div
+                          key={idx}
+                          className={`rounded-xl border border-gray-100 bg-white px-4 py-3.5 shadow-sm flex items-center justify-between gap-4 ${
+                            r.you ? 'bg-blue-50/40 border-blue-100' : ''
+                          }`}
+                        >
+                          <div className="min-w-0">
+                            <p className="text-[13px] font-semibold text-charcoal">
+                              #{r.rank} {r.name}
+                              {r.you && (
+                                <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide text-blue-600">
+                                  You
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[13px] font-semibold text-charcoal tabular-nums">{r.total}</p>
+                            <p className="text-[12px] text-gray-500 mt-0.5 tabular-nums">{r.hourly} / hr</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Feature preview only (no headline/button panel) */}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Platform */}
+      <section
+        id="section-platform"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24 border-t border-gray-100"
+      >
+        <div className="max-w-2xl mb-16 lg:mb-20">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">Platform</p>
+          <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal leading-[1.15] mb-6">
+            Everything you need. Nothing you don&apos;t.
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed font-normal">
+            Professional poker tracking without visual noise. Record sessions, follow your bankroll, and read your results at a glance.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+          {[
+            {
+              icon: Calendar,
+              title: 'Session recording',
+              copy: 'Cash, tournaments, live or online — logged in one structured place.',
+            },
+            {
+              icon: DollarSign,
+              title: 'Bankroll focus',
+              copy: 'Profit, hourly rate, and trends without spreadsheet gymnastics.',
+            },
+            {
+              icon: BarChart3,
+              title: 'Quiet analytics',
+              copy: 'Charts and summaries that respect your attention.',
+            },
+          ].map(({ icon: Icon, title, copy }) => (
+            <div
+              key={title}
+              className="group rounded-2xl border border-gray-100 bg-white/70 backdrop-blur-sm p-8 lg:p-9 transition-shadow duration-500 hover:shadow-luxury-sm"
+            >
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-gray-200 bg-white text-charcoal shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                <Icon className="h-5 w-5" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-semibold tracking-tight text-charcoal mb-3">{title}</h3>
+              <p className="text-[15px] leading-relaxed text-gray-600 font-normal">{copy}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sessions */}
+      <section
+        id="section-sessions"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24"
+      >
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="order-2 lg:order-1 rounded-[1.75rem] border border-gray-100 bg-gray-50 p-8 lg:p-10 shadow-luxury-sm">
+            <div className="space-y-3">
+              {[
+                { name: 'PokerStars', sub: '+$150 · 2.5h · Jan 15', amt: '+$150', pos: true },
+                { name: 'GGPoker', sub: '−$75 · 1.5h · Jan 14', amt: '−$75', pos: false },
+                { name: 'Aria Casino', sub: '+$300 · 4h · Jan 13', amt: '+$300', pos: true },
+              ].map((row) => (
+                <div
+                  key={row.name}
+                  className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-4"
+                >
+                  <div>
+                    <p className="text-[15px] font-medium text-charcoal tracking-tight">{row.name}</p>
+                    <p className="text-[13px] text-gray-500 mt-0.5">{row.sub}</p>
+                  </div>
+                  <span
+                    className={`text-[15px] font-semibold tabular-nums ${row.pos ? 'text-charcoal' : 'text-gray-500'}`}
+                  >
+                    {row.amt}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-600 mb-1">Today</p>
+              <p className="text-2xl font-semibold text-charcoal tracking-tight">+$375</p>
+              <p className="text-[13px] text-gray-600 mt-1">8h · $46.88 / hr</p>
+            </div>
+          </div>
+          <div className="order-1 lg:order-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">Sessions</p>
+            <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal leading-[1.15] mb-6">
+              Track from anywhere.
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-10 font-normal">
+              One ledger for every game type. See the story your results tell — without clutter.
+            </p>
             <button
+              type="button"
               onClick={onGetStarted}
-              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-2.5 rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-charcoal/15 bg-charcoal px-6 py-3 text-[14px] font-medium text-white tracking-tight transition hover:bg-charcoal/90"
             >
-              <span>Get Started</span>
-              <ArrowRight className="w-4 h-4" />
+              Open session log
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
             </button>
+            <ul className="mt-10 space-y-3 text-[14px] text-gray-600">
+              {['Cash and tournaments together', 'Automatic hourly figures', 'Any site or live room'].map((t) => (
+                <li key={t} className="flex items-center gap-2.5">
+                  <CheckCircle className="h-4 w-4 text-gray-400 shrink-0" strokeWidth={1.5} />
+                  {t}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </nav>
+      </section>
 
-      {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <Star className="w-4 h-4 mr-2 text-yellow-500" />
-            Completely free and intuitive
-          </div>
-          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            The poker tracker built for <span className="text-gray-500 dark:text-gray-400">winning</span>
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto font-normal leading-relaxed animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            Track your poker sessions, manage your bankroll, and improve your game with professional analytics. 
-            Better than Excel spreadsheets, easier than complex software.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
+      {/* Analytics */}
+      <section
+        id="section-analytics"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24 border-t border-gray-100"
+      >
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">Analytics</p>
+            <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal leading-[1.15] mb-6">
+              Progress over time.
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-10 font-normal">
+              Trends and summaries designed to be read quickly — then you get back to playing.
+            </p>
             <button
+              type="button"
               onClick={onGetStarted}
-              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full border border-charcoal/15 bg-charcoal px-6 py-3 text-[14px] font-medium text-white tracking-tight transition hover:bg-charcoal/90"
             >
-              <span>Start Tracking Free</span>
-              <ArrowRight className="w-5 h-5" />
+              View analytics
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
             </button>
-            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>No credit card required</span>
+            <ul className="mt-10 space-y-3 text-[14px] text-gray-600">
+              {['Clear charts', 'Hourly rate over any window', 'Breakdowns by game type'].map((t) => (
+                <li key={t} className="flex items-center gap-2.5">
+                  <CheckCircle className="h-4 w-4 text-gray-400 shrink-0" strokeWidth={1.5} />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-8 lg:p-10 shadow-luxury-sm">
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="rounded-xl border border-gray-200 bg-white p-4">
+                <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1">This month</p>
+                <p className="text-xl font-semibold text-charcoal tracking-tight">+$2,450</p>
+                <p className="text-[12px] text-gray-500 mt-1">vs prior month</p>
               </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Setup in 2 minutes</span>
+              <div className="rounded-xl border border-gray-200 bg-white p-4">
+                <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-1">Hourly</p>
+                <p className="text-xl font-semibold text-charcoal tracking-tight">$28.50</p>
+                <p className="text-[12px] text-gray-500 mt-1">Last 30 days</p>
+              </div>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-[13px] font-medium text-charcoal mb-4">Bankroll</p>
+              <div className="flex h-28 items-end gap-1">
+                {[35, 48, 42, 58, 52, 68, 62, 78, 72, 88, 85, 92].map((h, i) => (
+                  <div key={i} className="flex-1 rounded-t-sm bg-gray-200" style={{ height: `${h}%` }} />
+                ))}
+              </div>
+              <div className="flex justify-between text-[11px] text-gray-500 mt-3 uppercase tracking-wide">
+                <span>Jan</span>
+                <span>Jun</span>
+                <span>Dec</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-            All-in-one poker tracking platform
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-normal animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            Professional poker tracking without the complexity. Everything you need to analyze your game and improve your results.
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.9s' }}>
-            <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mb-6">
-              <Calendar className="h-7 w-7 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Session Recording
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Record every poker session with wins, losses, and time played. Get detailed insights into your performance across all game types and stakes.
+      {/* Groups */}
+      <section
+        id="section-groups"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24 border-t border-gray-100"
+      >
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">Groups</p>
+            <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal leading-[1.15] mb-6">
+              Compare with friends.
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-10 font-normal">
+              Invite a friend, track together, and see real-time ranking based on total profit, hourly rate, and sessions.
             </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '1.0s' }}>
-            <div className="w-14 h-14 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center mb-6">
-              <DollarSign className="h-7 w-7 text-green-600 dark:text-green-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Bankroll Management
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Monitor your bankroll growth and track your profit over time. See your hourly rates and performance trends with clear, actionable insights.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '1.1s' }}>
-            <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center mb-6">
-              <BarChart3 className="h-7 w-7 text-purple-600 dark:text-purple-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Smart Analytics
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Modern interface that's easier than Excel spreadsheets. Clean charts, automatic calculations, and professional analytics that help you improve your game.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Build a poker tracking engine Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '1.2s' }}>
-            Build a poker tracking engine
-          </h2>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left side - Mock interface */}
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '1.3s' }}>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">PS</span>
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">PokerStars</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">+$150 • 2.5 hours • Jan 15</div>
-                  </div>
-                </div>
-                <div className="text-green-600 dark:text-green-400 font-semibold">+$150</div>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">GG</span>
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">GGPoker</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">-$75 • 1.5 hours • Jan 14</div>
-                  </div>
-                </div>
-                <div className="text-red-600 dark:text-red-400 font-semibold">-$75</div>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">AC</span>
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">Aria Casino</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">+$300 • 4 hours • Jan 13</div>
-                  </div>
-                </div>
-                <div className="text-green-600 dark:text-green-400 font-semibold">+$300</div>
-              </div>
-            </div>
-            
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Today's Summary</div>
-              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">+$375</div>
-              <div className="text-sm text-blue-700 dark:text-blue-300">8 hours • $46.88/hr</div>
-            </div>
-          </div>
-
-          {/* Right side - Description */}
-          <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              Track sessions anywhere.
-            </h3>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-              Record every poker session — cash games, tournaments, live games, online poker — in a single view. 
-              Get instant insights into your performance across all game types.
-            </p>
-            <button 
-              onClick={onGetStarted}
-              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2"
-            >
-              <span>Learn about Session Tracking</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <div className="mt-8 space-y-4 text-sm text-gray-600 dark:text-gray-400">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Track cash games and tournaments in one place</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Automatic hourly rate calculations</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Works with any poker site or live games</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Analytics Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '1.5s' }}>
-            Analytics that matter
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '1.6s' }}>
-            Get insights into your poker performance with clear charts and statistics
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left side - Analytics description */}
-          <div className="animate-fade-in" style={{ animationDelay: '1.7s' }}>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              Track your progress over time.
-            </h3>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-              See your bankroll growth, hourly rates, and performance trends with professional analytics. 
-              Much better than Excel spreadsheets for tracking your poker results.
-            </p>
-            <button 
-              onClick={onGetStarted}
-              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2"
-            >
-              <span>Learn about Analytics</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <div className="mt-8 space-y-4 text-sm text-gray-600 dark:text-gray-400">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Visual charts and graphs for easy understanding</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Automatic hourly rate calculations</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Track performance across different game types</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right side - Mock analytics interface */}
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '1.8s' }}>
-            <div className="space-y-6">
-              {/* Performance Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">This Month</div>
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">+$2,450</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">+12.5% vs last month</div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Hourly Rate</div>
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">$28.50</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Last 30 days</div>
-                </div>
-              </div>
-
-              {/* Bankroll Chart Mock */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <div className="text-sm font-medium text-gray-900 dark:text-white mb-3">Bankroll Growth</div>
-                <div className="h-24 bg-gray-100 dark:bg-gray-700 rounded flex items-end space-x-1">
-                  <div className="w-4 bg-green-400 h-8 rounded-t"></div>
-                  <div className="w-4 bg-green-400 h-12 rounded-t"></div>
-                  <div className="w-4 bg-green-400 h-16 rounded-t"></div>
-                  <div className="w-4 bg-green-400 h-20 rounded-t"></div>
-                  <div className="w-4 bg-green-400 h-24 rounded-t"></div>
-                  <div className="w-4 bg-green-400 h-18 rounded-t"></div>
-                  <div className="w-4 bg-green-400 h-22 rounded-t"></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  <span>Jan</span>
-                  <span>Feb</span>
-                  <span>Mar</span>
-                  <span>Apr</span>
-                  <span>May</span>
-                  <span>Jun</span>
-                  <span>Jul</span>
-                </div>
-              </div>
-
-              {/* Session Summary */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Weekly Summary</div>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-lg font-bold text-blue-900 dark:text-blue-100">7</div>
-                    <div className="text-xs text-blue-700 dark:text-blue-300">Sessions</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-blue-900 dark:text-blue-100">28.5h</div>
-                    <div className="text-xs text-blue-700 dark:text-blue-300">Total Time</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-blue-900 dark:text-blue-100">$812</div>
-                    <div className="text-xs text-blue-700 dark:text-blue-300">Profit</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      {/* FAQ Section */}
-      <div className="max-w-4xl mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '1.9s' }}>
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in" style={{ animationDelay: '2.0s' }}>
-            Everything you need to know about our free poker tracker
-          </p>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.1s' }}>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Is this poker tracker really free?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Yes! Our poker tracker is completely free to use. Record your sessions, manage your bankroll, and analyze your performance without any cost or hidden fees.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.2s' }}>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              How is this better than Excel spreadsheets?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Our poker tracker is much easier to use than Excel spreadsheets. No complex formulas or manual calculations - just simple, clean features designed specifically for poker players.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.3s' }}>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Can I track sessions from multiple sites?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Absolutely! Record sessions from any poker site or live games. Our software combines everything into one comprehensive view of your performance across all platforms.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 animate-fade-in" style={{ animationDelay: '2.4s' }}>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              What poker statistics can I track?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Track wins, losses, profit, hourly rates, session duration, and bankroll growth. Everything you need to analyze and improve your poker game with professional insights.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-gray-50 dark:bg-gray-900 py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in" style={{ animationDelay: '2.5s' }}>
-            Ready to improve your poker game?
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 animate-fade-in" style={{ animationDelay: '2.6s' }}>
-            Start tracking your sessions today with the best free poker tracker.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '2.7s' }}>
-            <button
-              onClick={onGetStarted}
-              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-lg"
-            >
-              <span>Start Tracking Free</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Setup in 2 minutes</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black text-white py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="animate-fade-in" style={{ animationDelay: '2.8s' }}>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="h-8 w-8 rounded-lg overflow-hidden flex items-center justify-center border border-gray-600 bg-white dark:bg-black">
-                  <img src="/favicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain dark:hidden" />
-                  <img src="/invertedicon.png" alt="Poker Tracker" className="h-6 w-6 object-contain hidden dark:block" />
-                </div>
-                <span className="text-xl font-semibold text-white">Poker Tracker</span>
-              </div>
-              <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                The best free poker tracker for serious players. Track your sessions, manage your bankroll, and improve your game.
-              </p>
+            <ul className="mt-2 space-y-3 text-[14px] text-gray-600">
+              {[
+                'Invite links + quick join flow',
+                'Live leaderboard for everyone in your group',
+                'Moderator controls for what data shows',
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-2.5">
+                  <CheckCircle className="h-4 w-4 text-gray-400 shrink-0" strokeWidth={1.5} />
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-10 flex flex-wrap gap-2">
               <button
-                onClick={() => setIsSupportOpen(true)}
-                className="inline-flex items-center space-x-2 bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-all duration-200 text-sm"
+                type="button"
+                onClick={onGetStarted}
+                className="inline-flex items-center gap-2 rounded-full border border-charcoal/15 bg-charcoal px-6 py-3 text-[14px] font-medium text-white tracking-tight transition hover:bg-charcoal/90"
               >
-                <Mail className="w-4 h-4" />
-                <span>Contact Us</span>
+                Create your group
+                <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </button>
             </div>
-            
-            <div className="animate-fade-in" style={{ animationDelay: '2.9s' }}>
-              <h3 className="font-semibold text-white mb-4">Product</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Session Tracking</a></li>
-              </ul>
+          </div>
+          <div className="rounded-[1.75rem] border border-gray-100 bg-white p-8 lg:p-10 shadow-luxury-sm">
+            <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-6">
+              <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-2">Example leaderboard</p>
+              <div className="space-y-3">
+                {[
+                  { rank: 1, name: 'Alex', total: '+$1,240', hourly: '$52', sessions: '18' },
+                  { rank: 2, name: 'Marvin', total: '+$980', hourly: '$41', sessions: '17' },
+                  { rank: 3, name: 'You', total: '+$760', hourly: '$34', sessions: '16' },
+                ].map((row) => (
+                  <div key={row.rank} className="flex items-center justify-between gap-4 rounded-lg border border-gray-100 bg-white px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-charcoal truncate">
+                        #{row.rank} {row.name}
+                      </p>
+                      <p className="text-[12px] text-gray-500 mt-0.5">{row.sessions} sessions</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[13px] font-semibold text-charcoal tabular-nums">{row.total}</p>
+                      <p className="text-[12px] text-gray-500 mt-0.5">{row.hourly} / hr</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            
-            <div className="animate-fade-in" style={{ animationDelay: '3.0s' }}>
-              <h3 className="font-semibold text-white mb-4">Support</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Tutorials</a></li>
-              </ul>
-            </div>
-            
-            <div className="animate-fade-in" style={{ animationDelay: '3.1s' }}>
-              <h3 className="font-semibold text-white mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              </ul>
+            <div className="mt-6 rounded-xl border border-gray-100 bg-white px-5 py-4">
+              <p className="text-[12px] text-gray-600">
+                Members with moderator permissions can update filters (online only, location, blinds, and more).
+              </p>
             </div>
           </div>
-          
-          <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row items-center justify-between animate-fade-in" style={{ animationDelay: '3.2s' }}>
-            <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © 2025 Poker Tracker. All rights reserved.
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="section-faq" className="max-w-3xl mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24">
+        <div className="text-center mb-14">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">FAQ</p>
+          <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal">Common questions</h2>
+        </div>
+        <div className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white/60 backdrop-blur-sm overflow-hidden">
+          {[
+            {
+              q: 'Is this poker tracker really free?',
+              a: 'Yes. Record sessions, manage your bankroll, and review performance with no subscription or hidden fees.',
+            },
+            {
+              q: 'How is this better than a spreadsheet?',
+              a: 'It is built only for poker: fewer steps, no formula maintenance, and views that match how players think about results.',
+            },
+            {
+              q: 'Can I track multiple sites?',
+              a: 'Yes. Online and live sessions live in one ledger so you always see the full picture.',
+            },
+            {
+              q: 'What can I track?',
+              a: 'Wins, losses, profit, hourly rate, duration, and bankroll trajectory — the essentials for serious study.',
+            },
+          ].map(({ q, a }) => (
+            <div key={q} className="px-6 py-8 lg:px-8">
+              <h3 className="text-[17px] font-semibold text-charcoal tracking-tight mb-3">{q}</h3>
+              <p className="text-[15px] leading-relaxed text-gray-600 font-normal">{a}</p>
             </div>
-            <div className="flex items-center space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Terms</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Cookies</a>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-gray-100 py-20 lg:py-28">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal mb-5">
+            Ready when you are.
+          </h2>
+          <p className="text-lg text-gray-600 mb-10 font-normal leading-relaxed">
+            Start in minutes. No card required.
+          </p>
+          <button
+            type="button"
+            onClick={onGetStarted}
+            className="inline-flex items-center gap-2 rounded-full border border-charcoal/15 bg-charcoal px-8 py-3.5 text-[15px] font-medium text-white tracking-tight shadow-luxury-sm transition hover:bg-charcoal/90"
+          >
+            Start tracking free
+            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+          </button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 bg-gray-50 py-16 lg:py-20">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+          <div className="grid md:grid-cols-4 gap-12 mb-14">
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <img src="/pokericon.png" alt="" className="h-8 w-8 object-contain" />
+                <span className="text-[15px] font-semibold tracking-tight">Poker Tracker</span>
+              </div>
+              <p className="text-[14px] text-gray-600 leading-relaxed mb-6">
+                A free tracker for players who want clarity, not clutter.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsSupportOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-charcoal/15 bg-charcoal px-4 py-2 text-[13px] font-medium text-white transition hover:bg-charcoal/90"
+              >
+                <Mail className="h-3.5 w-3.5" strokeWidth={2} />
+                Contact
+              </button>
+            </div>
+            {[
+              {
+                title: 'Product',
+                links: ['Analytics', 'Sessions', 'Groups'],
+              },
+              {
+                title: 'Support',
+                links: ['Help', 'Contact', 'FAQ', 'Tutorials'],
+              },
+              {
+                title: 'Company',
+                links: ['About', 'Privacy', 'Terms', 'Cookies'],
+              },
+            ].map((col) => (
+              <div key={col.title}>
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">{col.title}</h3>
+                <ul className="space-y-2.5 text-[14px] text-gray-600">
+                  {col.links.map((item) => (
+                    <li key={item}>
+                      <a href="#" className="hover:text-charcoal transition-colors">
+                        {item}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-100 text-[13px] text-gray-500">
+            <span>© 2025 Poker Tracker</span>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-charcoal transition-colors">
+                Privacy
+              </a>
+              <a href="#" className="hover:text-charcoal transition-colors">
+                Terms
+              </a>
             </div>
           </div>
         </div>
       </footer>
-      
-      {/* Hidden SEO Content */}
+
       <div style={{ display: 'none' }}>
         <h1>Free Poker Tracker App - Best Free Poker Tracker Download</h1>
         <h2>Poker Tracker 4 Free Alternative - Poker Tracker App</h2>
         <h3>Download Free Poker Tracker App - Best Poker Tracking Software</h3>
         <p>
-          Looking for the best free poker tracker? Our free poker tracker app is better than Poker Tracker 4 free versions. 
-          Download our free poker tracker app today. This is the best free poker tracker available online. 
-          Get your free poker tracker download now. Our poker tracker app works better than Poker Tracker 4.
-          Free poker tracker app download available. Best free poker tracker for serious players.
-          Poker Tracker 4 free alternative that's actually free. Download free poker tracker app.
-          The best free poker tracker app for mobile and desktop. Free poker tracker download with no hidden costs.
-          Poker Tracker 4 free version alternative. Best free poker tracker app download. Poker tracker app that beats Poker Tracker 4.
-          Free poker tracker app download for Windows, Mac, and mobile. Best free poker tracker with advanced features.
-          Poker Tracker 4 free alternative with better interface. Download the best free poker tracker app today.
-          The best poker bankroll tracker for online poker players. Online poker tracker that works with all poker sites.
-          Free poker tracker download for bankroll management. Poker tracker pt4 alternative that's completely free.
-          Online poker tracker app for mobile and desktop. Poker tracker download free with no hidden costs.
-          Poker bankroll tracker that beats Poker Tracker PT4. Online poker tracking software for serious players.
-          Free poker bankroll tracker with advanced analytics. Poker tracker pt4 free alternative with better features.
-          Online poker tracker app download available. Poker tracker software that works better than PT4.
-          Poker bankroll management with our free poker tracker. Online poker tracker free download.
+          Looking for the best free poker tracker? Our free poker tracker app is better than Poker Tracker 4 free versions.
+          Download our free poker tracker app today. This is the best free poker tracker available online. Get your free
+          poker tracker download now. Our poker tracker app works better than Poker Tracker 4. Free poker tracker app download
+          available. Best free poker tracker for serious players. Poker Tracker 4 free alternative that&apos;s actually free.
+          Download free poker tracker app. The best free poker tracker app for mobile and desktop. Free poker tracker
+          download with no hidden costs. Poker Tracker 4 free version alternative. Best free poker tracker app download.
+          Poker tracker app that beats Poker Tracker 4. Free poker tracker app download for Windows, Mac, and mobile. Best
+          free poker tracker with advanced features. Poker Tracker 4 free alternative with better interface. Download the best
+          free poker tracker app today. The best poker bankroll tracker for online poker players. Online poker tracker that
+          works with all poker sites. Free poker tracker download for bankroll management. Poker tracker pt4 alternative
+          that&apos;s completely free. Online poker tracker app for mobile and desktop. Poker tracker download free with no
+          hidden costs. Poker bankroll tracker that beats Poker Tracker PT4. Online poker tracking software for serious
+          players. Free poker bankroll tracker with advanced analytics. Poker tracker pt4 free alternative with better
+          features. Online poker tracker app download available. Poker tracker software that works better than PT4. Poker
+          bankroll management with our free poker tracker. Online poker tracker free download.
         </p>
         <div>
           <span>free poker tracker app</span>
@@ -534,8 +704,7 @@ const LandingPage = ({ onGetStarted }) => {
           <li>Poker tracker pt4 free</li>
         </ul>
       </div>
-      
-      {/* Support Modal */}
+
       <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </div>
   );

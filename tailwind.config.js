@@ -1,13 +1,25 @@
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: 'class',
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        luxury: '0 25px 80px -12px rgba(0, 0, 0, 0.06)',
+        'luxury-sm': '0 4px 24px -4px rgba(0, 0, 0, 0.05)',
+        pill: '0 4px 14px -4px rgba(0, 0, 0, 0.06)',
+        soft: '0 1px 3px rgba(0, 0, 0, 0.05), 0 8px 40px -12px rgba(0, 0, 0, 0.06)',
+      },
       colors: {
+        canvas: '#ffffff',
+        charcoal: '#171717',
+        linen: '#f5f5f4',
+        mist: '#fafafa',
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',

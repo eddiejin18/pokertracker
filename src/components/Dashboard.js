@@ -1,41 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useTheme } from './ThemeProvider';
-import { 
-  LogOut, 
-  TrendingUp, 
-  TrendingDown, 
-  Clock, 
-  DollarSign, 
-  Target,
-  Calendar as CalendarIcon,
-  Home,
-  BarChart3
-} from 'lucide-react';
+import { LogOut, TrendingUp, TrendingDown, Home, Plus, Users } from 'lucide-react';
 import ApiService from '../services/api';
-import Calendar from './Calendar';
 import SessionList from './SessionList';
 import SessionPanel from './SessionPanel';
-import LoadingDots from './LoadingDots';
-import ThemeToggle from './ThemeToggle';
+import LoadingPercentScreen from './LoadingPercentScreen';
 import SupportModal from './SupportModal';
+import GroupsView from './GroupsView';
 
-const Dashboard = ({ user, onSignOut }) => {
+const Dashboard = ({ user, onSignOut, initialGroupId }) => {
   const [stats, setStats] = useState(null);
-  const { theme } = useTheme();
   const [chartData, setChartData] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1M');
   const [recentSessions, setRecentSessions] = useState([]);
-  const [activeView, setActiveView] = useState('dashboard');
   const [gameTypeData, setGameTypeData] = useState([]);
   const [locationData, setLocationData] = useState([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [loadPercent, setLoadPercent] = useState(0);
+  const loadProgressTimerRef = useRef(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [isEditPanelOpen, setIsEditPanelOpen] = useState(false);
   const [editingSession, setEditingSession] = useState(null);
   const [blindsOptions, setBlindsOptions] = useState([]);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [newSessionSeedDate, setNewSessionSeedDate] = useState(null);
   const defaultFilters = {
     location: 'ALL',
     gameType: 'ALL',
@@ -45,12 +35,38 @@ const Dashboard = ({ user, onSignOut }) => {
     endDate: ''
   };
   const [filters, setFilters] = useState(defaultFilters);
+  const [activeTab, setActiveTab] = useState(initialGroupId ? 'groups' : 'overview');
+
+  useEffect(() => {
+    if (initialGroupId) setActiveTab('groups');
+  }, [initialGroupId]);
 
   useEffect(() => {
     loadData();
   }, [selectedPeriod, filters]);
 
+  useEffect(() => {
+    if (!isInitialLoading) return;
+    setLoadPercent(0);
+    const started = performance.now();
+    const rampMs = 720;
+    const capBeforeDone = 88;
+    loadProgressTimerRef.current = setInterval(() => {
+      const elapsed = performance.now() - started;
+      const t = Math.min(1, elapsed / rampMs);
+      const eased = 1 - (1 - t) * (1 - t);
+      setLoadPercent(Math.min(capBeforeDone, Math.round(eased * capBeforeDone)));
+    }, 24);
+    return () => {
+      if (loadProgressTimerRef.current) {
+        clearInterval(loadProgressTimerRef.current);
+        loadProgressTimerRef.current = null;
+      }
+    };
+  }, [isInitialLoading]);
+
   const loadData = async () => {
+    const initialPass = isInitialLoading;
     try {
       if (isInitialLoading) {
         setIsInitialLoading(true);
@@ -100,8 +116,13 @@ const Dashboard = ({ user, onSignOut }) => {
       console.error('Error loading data:', error);
       setError('Failed to load data. Please try again.');
     } finally {
-      if (isInitialLoading) {
-        setIsInitialLoading(false);
+      if (initialPass) {
+        if (loadProgressTimerRef.current) {
+          clearInterval(loadProgressTimerRef.current);
+          loadProgressTimerRef.current = null;
+        }
+        setLoadPercent(100);
+        setTimeout(() => setIsInitialLoading(false), 220);
       }
       setIsRefreshing(false);
     }
@@ -115,13 +136,23 @@ const Dashboard = ({ user, onSignOut }) => {
     const totalHours = sessions.reduce((sum, session) => sum + toNumber(session.duration), 0);
     const hourlyProfit = totalHours > 0 ? totalWinnings / totalHours : 0;
 
+    let bestSession = null;
+    let worstSession = null;
+    sessions.forEach((session) => {
+      const w = toNumber(session.winnings);
+      if (bestSession === null || w > toNumber(bestSession.winnings)) bestSession = session;
+      if (worstSession === null || w < toNumber(worstSession.winnings)) worstSession = session;
+    });
+
     return {
       totalSessions,
       totalWinnings,
       totalBuyIns,
       totalHours,
       hourlyProfit,
-      averageWinnings: totalSessions > 0 ? totalWinnings / totalSessions : 0
+      averageWinnings: totalSessions > 0 ? totalWinnings / totalSessions : 0,
+      bestSession,
+      worstSession,
     };
   };
 
@@ -288,10 +319,18 @@ const Dashboard = ({ user, onSignOut }) => {
     loadData();
     setIsEditPanelOpen(false);
     setEditingSession(null);
+    setNewSessionSeedDate(null);
+  };
+
+  const handleAddSession = () => {
+    setEditingSession(null);
+    setNewSessionSeedDate(new Date());
+    setIsEditPanelOpen(true);
   };
 
   const handleEditSession = (session) => {
     setEditingSession(session);
+    setNewSessionSeedDate(null);
     setIsEditPanelOpen(true);
   };
 
@@ -309,16 +348,12 @@ const Dashboard = ({ user, onSignOut }) => {
   };
 
   if (isInitialLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-        <LoadingDots />
-      </div>
-    );
+    return <LoadingPercentScreen percent={loadPercent} />;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button 
@@ -339,87 +374,104 @@ const Dashboard = ({ user, onSignOut }) => {
     totalBuyIns: 0,
     totalHours: 0,
     hourlyProfit: 0,
-    averageWinnings: 0
+    averageWinnings: 0,
+    bestSession: null,
+    worstSession: null,
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white text-charcoal">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white/70 dark:bg-black/60 backdrop-blur border-b border-black/5 dark:border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-sm border border-black/10 dark:border-white/10 bg-white dark:bg-white">
-                <img src="/favicon.png" alt="Poker Tracker" className="h-8 w-8 object-contain" />
-              </div>
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center py-3 sm:py-4">
+            <button
+              type="button"
+              onClick={() => {
+                if (activeTab === 'groups') setActiveTab('overview');
+              }}
+              className="flex items-center gap-3 bg-transparent border-0 p-0 m-0 cursor-pointer text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+            >
+              <img src="/pokericon.png" alt="" className="h-9 w-9 object-contain" />
               <div>
-                <h1 className="text-2xl font-bold text-black dark:text-white">Poker Tracker</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Welcome back, {user?.name}</p>
+                <h1 className="text-lg font-semibold tracking-tight text-charcoal">Poker Tracker</h1>
+                <p className="text-[13px] text-gray-500">{user?.name}</p>
               </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* New Tab Slider */}
-              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            </button>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50/80 p-0.5">
                 <button
-                  onClick={() => setActiveView('dashboard')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                    activeView === 'dashboard'
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  type="button"
+                  onClick={() => setActiveTab('overview')}
+                  className={`px-3 py-2 rounded-md text-[13px] font-medium transition-all flex items-center gap-1.5 ${
+                    activeTab === 'overview'
+                      ? 'bg-white text-charcoal shadow-sm border border-gray-100'
+                      : 'text-gray-500 hover:text-charcoal'
                   }`}
                 >
-                  <Home className="h-4 w-4" />
-                  <span>Dashboard</span>
+                  <Home className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  Overview
                 </button>
                 <button
-                  onClick={() => setActiveView('calendar')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                    activeView === 'calendar'
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  type="button"
+                  onClick={() => setActiveTab('groups')}
+                  className={`px-3 py-2 rounded-md text-[13px] font-medium transition-all flex items-center gap-1.5 ${
+                    activeTab === 'groups'
+                      ? 'bg-white text-charcoal shadow-sm border border-gray-100'
+                      : 'text-gray-500 hover:text-charcoal'
                   }`}
                 >
-                  <CalendarIcon className="h-4 w-4" />
-                  <span>Sessions</span>
+                  <Users className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  Groups
                 </button>
               </div>
-              <ThemeToggle />
-              <button
-                onClick={() => setIsSupportOpen(true)}
-                className="btn"
-              >
-                Contact Support
+              <button type="button" onClick={() => setIsSupportOpen(true)} className="btn text-[13px]">
+                Support
               </button>
-              <button
-                onClick={onSignOut}
-                className="btn"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+              <button type="button" onClick={onSignOut} className="btn text-[13px]">
+                <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
+                Sign out
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black dark:text-white">
-        {activeView === 'dashboard' && (
-          <>
-            {/* Filters */}
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-black dark:text-white">Filters</h3>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-7">
+        {activeTab === 'groups' ? (
+          <GroupsView initialSelectedGroupId={initialGroupId} />
+        ) : (
+        <>
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+              <div>
+                <h1 className="text-xl font-bold text-neutral-900 tracking-tight">Overview</h1>
+                <p className="text-[13px] text-gray-500 mt-0.5">Performance and session history</p>
+              </div>
+            </div>
+            {/* Filters — collapsible to save vertical space */}
+            <div className="mb-4 rounded-xl border border-gray-100 bg-white p-3 sm:p-4 shadow-soft">
+            <div className="flex items-center justify-between gap-2">
               <button
+                type="button"
+                onClick={() => setFiltersOpen((o) => !o)}
+                className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-charcoal"
+              >
+                Filters {filtersOpen ? '▴' : '▾'}
+              </button>
+              <button
+                type="button"
                 onClick={() => setFilters(defaultFilters)}
-                className="text-xs px-3 py-1 border border-black/10 dark:border-white/10 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="text-[12px] text-gray-500 hover:text-charcoal transition-colors"
               >
                 Clear all
               </button>
             </div>
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {filtersOpen && (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3 pt-3 border-t border-gray-100">
               <div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Location</div>
+                <div className="text-[11px] font-medium text-gray-500 mb-1.5">Location</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.location} onChange={e=>setFilters(prev=>({...prev, location:e.target.value}))}>
+                  <select className="appearance-none border border-gray-200 rounded-lg px-3 pr-9 py-2 text-[13px] w-full bg-white text-charcoal" value={filters.location} onChange={e=>setFilters(prev=>({...prev, location:e.target.value}))}>
                     <option value="ALL">All</option>
                     {[...new Set((locationData||[]).map(l=>l.location))].map(loc=>(<option key={loc} value={loc}>{loc}</option>))}
                   </select>
@@ -427,9 +479,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Variation</div>
+                <div className="text-[11px] font-medium text-gray-500 mb-1.5">Variation</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.gameType} onChange={e=>setFilters(prev=>({...prev, gameType:e.target.value}))}>
+                  <select className="appearance-none border border-gray-200 rounded-lg px-3 pr-9 py-2 text-[13px] w-full bg-white text-charcoal" value={filters.gameType} onChange={e=>setFilters(prev=>({...prev, gameType:e.target.value}))}>
                     <option value="ALL">All</option>
                     {[...new Set((gameTypeData||[]).map(g=>g.gameType))].map(gt=>(<option key={gt} value={gt}>{gt}</option>))}
                   </select>
@@ -437,9 +489,9 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Blinds/Stakes</div>
+                <div className="text-[11px] font-medium text-gray-500 mb-1.5">Blinds/Stakes</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.blinds} onChange={e=>setFilters(prev=>({...prev, blinds:e.target.value}))}>
+                  <select className="appearance-none border border-gray-200 rounded-lg px-3 pr-9 py-2 text-[13px] w-full bg-white text-charcoal" value={filters.blinds} onChange={e=>setFilters(prev=>({...prev, blinds:e.target.value}))}>
                     <option value="ALL">All</option>
                     {blindsOptions.map(b => (<option key={b} value={b}>{b}</option>))}
                   </select>
@@ -447,244 +499,180 @@ const Dashboard = ({ user, onSignOut }) => {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Location Type</div>
+                <div className="text-[11px] font-medium text-gray-500 mb-1.5">Location Type</div>
                 <div className="relative">
-                  <select className="appearance-none border border-black/10 dark:border-white/20 rounded-md px-2 pr-9 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.locationType} onChange={e=>setFilters(prev=>({...prev, locationType:e.target.value}))}>
+                  <select className="appearance-none border border-gray-200 rounded-lg px-3 pr-9 py-2 text-[13px] w-full bg-white text-charcoal" value={filters.locationType} onChange={e=>setFilters(prev=>({...prev, locationType:e.target.value}))}>
                     <option value="ALL">All</option>
                     <option value="home">Home</option>
                     <option value="casino">Casino</option>
+                    <option value="online">Online</option>
                   </select>
                   <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Start Date</div>
-                <input type="date" className="border border-black/10 dark:border-white/20 rounded-md px-2 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.startDate} onChange={e=>setFilters(prev=>({...prev, startDate:e.target.value}))} />
+                <div className="text-[11px] font-medium text-gray-500 mb-1.5">Start Date</div>
+                <input type="date" className="border border-gray-200 rounded-lg px-3 py-2 text-[13px] w-full bg-white text-charcoal" value={filters.startDate} onChange={e=>setFilters(prev=>({...prev, startDate:e.target.value}))} />
               </div>
               <div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">End Date</div>
-                <input type="date" className="border border-black/10 dark:border-white/20 rounded-md px-2 py-1.5 text-sm w-full bg-white dark:bg-black text-black dark:text-white" value={filters.endDate} onChange={e=>setFilters(prev=>({...prev, endDate:e.target.value}))} />
+                <div className="text-[11px] font-medium text-gray-500 mb-1.5">End Date</div>
+                <input type="date" className="border border-gray-200 rounded-lg px-3 py-2 text-[13px] w-full bg-white text-charcoal" value={filters.endDate} onChange={e=>setFilters(prev=>({...prev, endDate:e.target.value}))} />
               </div>
             </div>
-          </>
-        )}
-        {activeView === 'calendar' ? (
-          <Calendar onSessionAdded={handleSessionAdded} />
-        ) : (
-          <>
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
+            )}
+            </div>
+        {/* Chart + summary: side-by-side on large screens to shorten the page */}
+        <div className={`grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4 ${isRefreshing ? 'opacity-80' : ''}`}>
+        <div className="lg:col-span-3 rounded-xl border border-gray-100 bg-white p-4 sm:p-5 shadow-soft">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-3">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Winnings</p>
-              <p className={`text-2xl font-bold ${safeStats.totalWinnings >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
-                {formatCurrency(safeStats.totalWinnings)}
-              </p>
+              <h2 className="text-[14px] font-semibold text-neutral-900 tracking-tight">Cumulative profit</h2>
+              <p className="text-[12px] text-gray-500 mt-0.5">Based on filters and time range</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-1">
+              {isRefreshing && (
+                <span className="inline-block h-3.5 w-3.5 rounded-full border-2 border-gray-200 border-t-blue-600 animate-spin mr-1" />
+              )}
+              {['1W', '1M', '3M', '1Y', 'ALL'].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setSelectedPeriod(p)}
+                  className={`px-2 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                    selectedPeriod === p
+                      ? 'bg-blue-600 text-white'
+                      : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
           </div>
-
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sessions Played</p>
-              <p className="text-2xl font-bold text-black dark:text-white">{safeStats.totalSessions}</p>
-            </div>
-          </div>
-
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hours</p>
-              <p className="text-2xl font-bold text-black dark:text-white">{formatDuration(safeStats.totalHours)}</p>
-            </div>
-          </div>
-
-          <div className={`card p-6 ${isRefreshing ? 'opacity-70' : ''}`}>
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Hourly Profit</p>
-              <p className={`text-2xl font-bold ${safeStats.hourlyProfit >= 0 ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
-                {formatCurrency(safeStats.hourlyProfit)}/hr
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Winnings Chart */}
-          <div className="flex-1">
-            <div className="card p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-black dark:text-white">Profit Over Time</h3>
-                <div className="flex items-center space-x-2">
-                  {isRefreshing && (
-                    <span className="inline-block h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin text-black dark:text-white" />
-                  )}
-                  <button
-                    onClick={() => setSelectedPeriod('1W')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                      selectedPeriod === '1W'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
-                    }`}
-                  >
-                    1W
-                  </button>
-                  <button
-                    onClick={() => setSelectedPeriod('1M')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                      selectedPeriod === '1M'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
-                    }`}
-                  >
-                    1M
-                  </button>
-                  <button
-                    onClick={() => setSelectedPeriod('3M')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                      selectedPeriod === '3M'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
-                    }`}
-                  >
-                    3M
-                  </button>
-                  <button
-                    onClick={() => setSelectedPeriod('1Y')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                      selectedPeriod === '1Y'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
-                    }`}
-                  >
-                    1Y
-                  </button>
-                  <button
-                    onClick={() => setSelectedPeriod('ALL')}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                      selectedPeriod === 'ALL'
-                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                        : 'bg-white text-black border border-black/10 hover:bg-gray-100 dark:bg-black dark:text-white dark:border-white/20 dark:hover:bg-neutral-900'
-                    }`}
-                  >
-                    ALL
-                  </button>
-                </div>
-              </div>
-              
-              <div className={`h-80 pb-4 ${isRefreshing ? 'opacity-60 transition-opacity' : ''}`}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1f2937' : '#f0f0f0'} />
-                    <XAxis 
-                      dataKey="period" 
-                      stroke={theme === 'dark' ? '#9ca3af' : '#666'}
-                      fontSize={12}
-                      tickMargin={8}
-                    />
-                    <YAxis 
-                      stroke={theme === 'dark' ? '#9ca3af' : '#666'}
-                      fontSize={12}
-                      tickFormatter={(value) => `$${value}`}
-                    />
-                    <Tooltip 
-                      formatter={(value) => [formatCurrency(value), 'Cumulative Profit']}
-                      labelStyle={{ color: theme === 'dark' ? '#e5e7eb' : '#374151' }}
-                      contentStyle={{
-                        backgroundColor: theme === 'dark' ? '#000000' : 'white',
-                        border: theme === 'dark' ? '1px solid #1f2937' : '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="winnings" 
-                      stroke={theme === 'dark' ? '#ffffff' : '#000000'} 
-                      strokeWidth={3}
-                      dot={{ fill: theme === 'dark' ? '#ffffff' : '#000000', strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, stroke: theme === 'dark' ? '#ffffff' : '#000000', strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Sessions */}
-          <div className="w-full lg:w-80">
-            <div className="card p-6 h-full flex flex-col">
-              <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Sessions</h3>
-              <div 
-                className="h-80 overflow-y-auto"
-                onWheel={(e) => {
-                  e.stopPropagation();
-                }}
-                onTouchMove={(e) => {
-                  e.stopPropagation();
-                }}
-                onScroll={(e) => {
-                  e.stopPropagation();
-                }}
-                onTouchStart={(e) => {
-                  e.stopPropagation();
-                }}
-                onTouchEnd={(e) => {
-                  e.stopPropagation();
-                }}
-                style={{ touchAction: 'pan-y' }}
-              >
-                <SessionList 
-                  sessions={recentSessions} 
-                  onSessionUpdated={loadData}
-                  onEditSession={handleEditSession}
+          <div className="h-[180px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="4 4" stroke="#f4f4f5" vertical={false} />
+                <XAxis dataKey="period" stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} tickMargin={8} />
+                <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} width={48} />
+                <Tooltip
+                  formatter={(value) => [formatCurrency(value), 'Cumulative']}
+                  labelStyle={{ color: '#52525b', fontSize: 12 }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e4e4e7',
+                    borderRadius: '10px',
+                    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.12)',
+                  }}
                 />
-              </div>
-            </div>
+                <Line
+                  type="monotone"
+                  dataKey="winnings"
+                  stroke="#2563eb"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 5, fill: '#2563eb', strokeWidth: 0 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Additional Stats */}
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
+          <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-soft">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500">Total profit</p>
+            <p className={`text-xl font-semibold tabular-nums mt-1 ${safeStats.totalWinnings >= 0 ? 'text-neutral-900' : 'text-gray-500'}`}>
+              {formatCurrency(safeStats.totalWinnings)}
+            </p>
+            <p className="text-[11px] text-gray-500 mt-1">After filters</p>
+          </div>
+          <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-soft">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500">Sessions</p>
+            <p className="text-xl font-semibold tabular-nums text-neutral-900 mt-1">{safeStats.totalSessions}</p>
+            <p className="text-[11px] text-gray-500 mt-1">{formatDuration(safeStats.totalHours)} played</p>
+          </div>
+          <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-soft">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500">Hourly</p>
+            <p className={`text-xl font-semibold tabular-nums mt-1 ${safeStats.hourlyProfit >= 0 ? 'text-neutral-900' : 'text-gray-500'}`}>
+              {formatCurrency(safeStats.hourlyProfit)}
+            </p>
+            <p className="text-[11px] text-gray-500 mt-1">Per hour</p>
+          </div>
+        </div>
+        </div>
+
+        {/* Best / worst — compact row */}
         {safeStats.bestSession && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <TrendingUp className="h-5 w-5 text-success-600 mr-2" />
-                Best Session
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-soft">
+              <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <TrendingUp className="h-3.5 w-3.5 text-neutral-400" strokeWidth={1.5} />
+                Best session
               </h3>
-              <div className="space-y-2">
-                <p className="text-2xl font-bold text-black">
-                  {formatCurrency(safeStats.bestSession.winnings)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {new Date(safeStats.bestSession.timestamp).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Duration: {formatDuration(safeStats.bestSession.duration || 0)}
-                </p>
-              </div>
+              <p className="text-lg font-semibold tabular-nums text-charcoal">
+                {formatCurrency(safeStats.bestSession.winnings)}
+              </p>
+              <p className="text-[12px] text-gray-500 mt-0.5">
+                {new Date(safeStats.bestSession.timestamp).toLocaleDateString()} ·{' '}
+                {formatDuration(safeStats.bestSession.duration || 0)}
+              </p>
             </div>
 
             {safeStats.worstSession && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <TrendingDown className="h-5 w-5 text-danger-600 mr-2" />
-                  Worst Session
+              <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-soft">
+                <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                  <TrendingDown className="h-3.5 w-3.5 text-gray-400" strokeWidth={1.5} />
+                  Worst session
                 </h3>
-                <div className="space-y-2">
-                  <p className="text-2xl font-bold text-gray-600">
-                    {formatCurrency(safeStats.worstSession.winnings)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {new Date(safeStats.worstSession.timestamp).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Duration: {formatDuration(safeStats.worstSession.duration || 0)}
-                  </p>
-                </div>
+                <p className="text-lg font-semibold tabular-nums text-gray-600">
+                  {formatCurrency(safeStats.worstSession.winnings)}
+                </p>
+                <p className="text-[12px] text-gray-500 mt-0.5">
+                  {new Date(safeStats.worstSession.timestamp).toLocaleDateString()} ·{' '}
+                  {formatDuration(safeStats.worstSession.duration || 0)}
+                </p>
               </div>
             )}
           </div>
         )}
-          </>
+
+        {/* Recent sessions — transaction rows (bottom of Overview) */}
+        <div className="mt-4 rounded-xl border border-gray-100 bg-white p-4 sm:p-5 shadow-soft">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-[14px] font-semibold text-neutral-900 tracking-tight">Recent sessions</h2>
+              <p className="text-[12px] text-gray-500 mt-0.5">
+                Newest first · {recentSessions.length} session{recentSessions.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddSession}
+              className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 bg-white text-charcoal shadow-sm hover:bg-gray-50 transition-colors shrink-0"
+              title="Add session"
+              aria-label="Add session"
+            >
+              <Plus className="h-4 w-4" strokeWidth={2} />
+            </button>
+          </div>
+          <div
+            className="overflow-x-auto -mx-1 px-1"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onScroll={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            style={{ touchAction: 'pan-y' }}
+          >
+            <SessionList
+              sessions={recentSessions}
+              onSessionUpdated={loadData}
+              onEditSession={handleEditSession}
+              variant="table"
+            />
+          </div>
+        </div>
+        </>
         )}
       </div>
 
@@ -694,9 +682,10 @@ const Dashboard = ({ user, onSignOut }) => {
         onClose={() => {
           setIsEditPanelOpen(false);
           setEditingSession(null);
+          setNewSessionSeedDate(null);
         }}
         onSessionAdded={handleSessionAdded}
-        selectedDate={null}
+        selectedDate={editingSession ? null : newSessionSeedDate}
         editingSession={editingSession}
       />
 
