@@ -1,6 +1,7 @@
 {
   "short_name": "Poker Tracker",
-  "name": "Free Poker Tracker and Bankroll Tracker",
+  "name": "Poker Tracker — free sessions & bankroll tracking",
+  "description": "Log live and online poker sessions, track profit, hourly rate, analytics, and optional friend groups.",
   "icons": [
     {
       "src": "pokericon.png",

@@ -447,6 +447,18 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'locationType') {
+      setFormData((prev) => ({
+        ...prev,
+        locationType: value,
+        location: '',
+        casinoName: '',
+      }));
+      setShowCasinoSuggestions(false);
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -545,6 +557,9 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
   if (!isOpen) return null;
 
   const winnings = calculateWinnings();
+  const locationOnlineHeadsUp =
+    formData.locationType === 'home' &&
+    formData.location.trim().toLowerCase() === 'online';
 
   return (
     <div
@@ -740,18 +755,26 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
                 )}
               </div>
             ) : (
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                placeholder={
-                  formData.locationType === 'online'
-                    ? 'e.g. PokerStars, GGPoker, 888poker'
-                    : "e.g. John's house, private game"
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
-              />
+              <div>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  placeholder={
+                    formData.locationType === 'online'
+                      ? 'e.g. PokerStars, GGPoker, 888poker'
+                      : "e.g. John's house, private game"
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-500"
+                />
+                {locationOnlineHeadsUp && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Tip: for online play, select{' '}
+                    <span className="font-medium text-gray-700">Online</span> above (optional).
+                  </p>
+                )}
+              </div>
             )}
           </div>
 

@@ -42,7 +42,11 @@ const LandingPage = ({ onGetStarted }) => {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/pokericon.png" alt="" className="h-9 w-9 object-contain" />
+            <img
+              src="/pokericon.png"
+              alt="Poker Tracker — free poker bankroll and session tracking app"
+              className="h-9 w-9 object-contain"
+            />
             <span className="text-[15px] font-semibold tracking-tight text-charcoal">Poker Tracker</span>
           </div>
           <button
@@ -56,14 +60,15 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
       </header>
 
+      <main id="main-content">
       {/* Hero: sidebar + feature card */}
       <div id="hero" className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-12 lg:pt-16 pb-20 lg:pb-28 scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Sidebar navigation */}
-          <aside className="lg:col-span-4 xl:col-span-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-8">
-              Our product
-            </p>
+          <aside className="lg:col-span-4 xl:col-span-3" aria-label="Product areas">
+            <h1 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-8">
+              Free poker tracker · live &amp; online sessions
+            </h1>
             <nav className="space-y-1" aria-label="Product sections">
               {navItems.map(({ id, label, icon: Icon }) => {
                 const active = activeNav === id;
@@ -557,7 +562,7 @@ const LandingPage = ({ onGetStarted }) => {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-gray-100 py-20 lg:py-28">
+      <section className="border-t border-gray-100 py-20 lg:py-28" aria-label="Get started">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal mb-5">
             Ready when you are.
@@ -575,6 +580,7 @@ const LandingPage = ({ onGetStarted }) => {
           </button>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-gray-100 bg-gray-50 py-16 lg:py-20">
@@ -582,7 +588,11 @@ const LandingPage = ({ onGetStarted }) => {
           <div className="grid md:grid-cols-4 gap-12 mb-14">
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <img src="/pokericon.png" alt="" className="h-8 w-8 object-contain" />
+                <img
+                  src="/pokericon.png"
+                  alt="Poker Tracker logo"
+                  className="h-8 w-8 object-contain"
+                />
                 <span className="text-[15px] font-semibold tracking-tight">Poker Tracker</span>
               </div>
               <p className="text-[14px] text-gray-600 leading-relaxed mb-6">
@@ -600,24 +610,34 @@ const LandingPage = ({ onGetStarted }) => {
             {[
               {
                 title: 'Product',
-                links: ['Analytics', 'Sessions', 'Groups'],
+                links: [
+                  { label: 'Analytics', href: '#section-analytics' },
+                  { label: 'Sessions', href: '#section-sessions' },
+                  { label: 'Groups', href: '#section-groups' },
+                ],
+              },
+              {
+                title: 'Guides',
+                links: [
+                  { label: 'Track sessions & profit', href: '/guides/track-poker-sessions-profit' },
+                  { label: 'Bankroll basics', href: '/guides/poker-bankroll-management' },
+                ],
               },
               {
                 title: 'Support',
-                links: ['Help', 'Contact', 'FAQ', 'Tutorials'],
-              },
-              {
-                title: 'Company',
-                links: ['About', 'Privacy', 'Terms', 'Cookies'],
+                links: [
+                  { label: 'FAQ', href: '#section-faq' },
+                  { label: 'Contact', href: '#section-faq' },
+                ],
               },
             ].map((col) => (
               <div key={col.title}>
                 <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">{col.title}</h3>
                 <ul className="space-y-2.5 text-[14px] text-gray-600">
                   {col.links.map((item) => (
-                    <li key={item}>
-                      <a href="#" className="hover:text-charcoal transition-colors">
-                        {item}
+                    <li key={item.label}>
+                      <a href={item.href} className="hover:text-charcoal transition-colors">
+                        {item.label}
                       </a>
                     </li>
                   ))}
@@ -626,84 +646,15 @@ const LandingPage = ({ onGetStarted }) => {
             ))}
           </div>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-100 text-[13px] text-gray-500">
-            <span>© 2025 Poker Tracker</span>
+            <span>© {new Date().getFullYear()} Poker Tracker</span>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-charcoal transition-colors">
-                Privacy
-              </a>
-              <a href="#" className="hover:text-charcoal transition-colors">
-                Terms
+              <a href="#main-content" className="hover:text-charcoal transition-colors">
+                Back to top
               </a>
             </div>
           </div>
         </div>
       </footer>
-
-      <div style={{ display: 'none' }}>
-        <h1>Free Poker Tracker App - Best Free Poker Tracker Download</h1>
-        <h2>Poker Tracker 4 Free Alternative - Poker Tracker App</h2>
-        <h3>Download Free Poker Tracker App - Best Poker Tracking Software</h3>
-        <p>
-          Looking for the best free poker tracker? Our free poker tracker app is better than Poker Tracker 4 free versions.
-          Download our free poker tracker app today. This is the best free poker tracker available online. Get your free
-          poker tracker download now. Our poker tracker app works better than Poker Tracker 4. Free poker tracker app download
-          available. Best free poker tracker for serious players. Poker Tracker 4 free alternative that&apos;s actually free.
-          Download free poker tracker app. The best free poker tracker app for mobile and desktop. Free poker tracker
-          download with no hidden costs. Poker Tracker 4 free version alternative. Best free poker tracker app download.
-          Poker tracker app that beats Poker Tracker 4. Free poker tracker app download for Windows, Mac, and mobile. Best
-          free poker tracker with advanced features. Poker Tracker 4 free alternative with better interface. Download the best
-          free poker tracker app today. The best poker bankroll tracker for online poker players. Online poker tracker that
-          works with all poker sites. Free poker tracker download for bankroll management. Poker tracker pt4 alternative
-          that&apos;s completely free. Online poker tracker app for mobile and desktop. Poker tracker download free with no
-          hidden costs. Poker bankroll tracker that beats Poker Tracker PT4. Online poker tracking software for serious
-          players. Free poker bankroll tracker with advanced analytics. Poker tracker pt4 free alternative with better
-          features. Online poker tracker app download available. Poker tracker software that works better than PT4. Poker
-          bankroll management with our free poker tracker. Online poker tracker free download.
-        </p>
-        <div>
-          <span>free poker tracker app</span>
-          <span>free poker tracker download</span>
-          <span>best free poker tracker</span>
-          <span>poker tracker 4</span>
-          <span>poker tracker 4 free</span>
-          <span>poker tracker app</span>
-          <span>download free poker tracker app</span>
-          <span>best poker tracker app</span>
-          <span>poker tracker 4 alternative</span>
-          <span>free poker tracking software</span>
-          <span>poker tracker mobile app</span>
-          <span>poker tracker 4 free download</span>
-          <span>poker bankroll tracker</span>
-          <span>online poker tracker</span>
-          <span>poker tracker download</span>
-          <span>poker tracker pt4</span>
-          <span>poker tracker free</span>
-          <span>poker bankroll management</span>
-          <span>online poker tracking</span>
-          <span>poker tracker software</span>
-          <span>poker tracker pt4 alternative</span>
-          <span>free poker bankroll tracker</span>
-          <span>online poker tracker app</span>
-          <span>poker tracker download free</span>
-          <span>poker tracker pt4 free</span>
-        </div>
-        <ul>
-          <li>Free poker tracker app download</li>
-          <li>Best free poker tracker software</li>
-          <li>Poker Tracker 4 free alternative</li>
-          <li>Download poker tracker app</li>
-          <li>Free poker tracking app</li>
-          <li>Poker tracker 4 vs free tracker</li>
-          <li>Poker bankroll tracker free</li>
-          <li>Online poker tracker app</li>
-          <li>Poker tracker download free</li>
-          <li>Poker tracker pt4 alternative</li>
-          <li>Poker tracker free download</li>
-          <li>Online poker tracking software</li>
-          <li>Poker bankroll management tracker</li>
-          <li>Poker tracker pt4 free</li>
-        </ul>
-      </div>
 
       <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </div>

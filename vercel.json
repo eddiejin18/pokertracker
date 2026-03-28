@@ -63,6 +63,14 @@
       "dest": "/build/index.html"
     },
     {
+      "src": "/guides/track-poker-sessions-profit",
+      "dest": "/build/guides/track-poker-sessions-profit.html"
+    },
+    {
+      "src": "/guides/poker-bankroll-management",
+      "dest": "/build/guides/poker-bankroll-management.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/build/$1"
     }

@@ -5,24 +5,27 @@
     <link rel="icon" type="image/png" href="%PUBLIC_URL%/pokericon.png" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/pokericon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#fafafa" />
     <meta
       name="description"
-      content="Free poker tracker and poker bankroll tracker for live and online players. Track sessions, winnings, profit, hourly rate, and bankroll in a clean dashboard."
+      content="Free poker tracker and bankroll tracker: log live and online sessions, profit, hourly rate, charts, and friend groups. No subscription — built for serious players."
     />
-    <meta name="robots" content="index,follow" />
-    <meta name="keywords" content="free poker tracker, poker bankroll tracker, bankroll tracker, poker session tracker, track poker winnings, poker profit tracker, online poker tracker, live poker tracker, poker bankroll management, poker analytics" />
-    <meta property="og:title" content="Free Poker Tracker | Poker Bankroll Tracker" />
-    <meta property="og:description" content="Track poker sessions, bankroll, profit, and hourly in one clean free poker tracker for live and online games." />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="keywords" content="free poker tracker, poker bankroll tracker, poker session tracker, track poker winnings, poker profit tracker, online poker tracker, live poker tracker, poker analytics, poker groups leaderboard" />
+    <meta name="author" content="Poker Tracker" />
+    <meta property="og:title" content="Free Poker Tracker & Bankroll Tracker for Live & Online Play" />
+    <meta property="og:description" content="Log sessions, track bankroll and hourly rate, view analytics, and compare results with friends — free poker tracker for cash games and online rooms." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://freepokertracker.com" />
-    <meta property="og:image" content="%PUBLIC_URL%/pokericon.png" />
+    <meta property="og:url" content="https://freepokertracker.com/" />
+    <meta property="og:image" content="https://freepokertracker.com/pokericon.png" />
+    <meta property="og:image:alt" content="Poker Tracker — free poker bankroll and session tracking" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Poker Tracker" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Free Poker Tracker | Poker Bankroll Tracker" />
-    <meta name="twitter:description" content="Free poker bankroll tracker to log sessions, winnings, and hourly rate for live and online poker." />
-    <meta name="twitter:image" content="%PUBLIC_URL%/pokericon.png" />
-    <link rel="canonical" href="https://freepokertracker.com" />
+    <meta name="twitter:title" content="Free Poker Tracker & Bankroll Tracker for Live & Online Play" />
+    <meta name="twitter:description" content="Log sessions, profit, hourly rate, and group leaderboards. Free poker tracker for live and online games." />
+    <meta name="twitter:image" content="https://freepokertracker.com/pokericon.png" />
+    <link rel="canonical" href="https://freepokertracker.com/" />
     <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE" />
     <meta name="googlebot" content="index, follow" />
     <meta name="bingbot" content="index, follow" />
@@ -30,7 +33,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
     <link rel="manifest" href="/manifest.json" />
-    <title>Free Poker Tracker & Poker Bankroll Tracker</title>
+    <title>Free Poker Tracker & Bankroll Tracker | Live & Online Sessions</title>
     <style>
       html, body, #root { background: #ffffff !important; }
     </style>
@@ -38,34 +41,103 @@
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Free Poker Tracker",
+        "name": "Poker Tracker",
+        "alternateName": "Free Poker Tracker",
         "url": "https://freepokertracker.com",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
-        "description": "Free poker tracker and poker bankroll tracker for live and online players. Track sessions, winnings, profit, hourly rate, and bankroll in one dashboard.",
-        "keywords": "free poker tracker, poker bankroll tracker, bankroll tracker, poker session tracker, track poker winnings, poker profit tracker",
         "browserRequirements": "Requires JavaScript",
-        "softwareVersion": "1.0",
-        "creator": {
-          "@type": "Organization",
-          "name": "Poker Tracker"
-        },
+        "description": "Free poker tracker and bankroll tracker for live and online play. Record sessions, track profit, hourly rate, analytics, and optional group leaderboards.",
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "USD"
         },
-        "image": "/pokericon.png",
-        "potentialAction": {
-          "@type": "UseAction",
-          "target": "https://freepokertracker.com"
+        "image": "https://freepokertracker.com/pokericon.png",
+        "author": {
+          "@type": "Organization",
+          "name": "Poker Tracker",
+          "url": "https://freepokertracker.com"
         }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Poker Tracker",
+        "url": "https://freepokertracker.com",
+        "description": "Free poker tracker for sessions, bankroll, hourly rate, and group rankings.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Poker Tracker",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://freepokertracker.com/pokericon.png"
+          }
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Poker Tracker",
+        "url": "https://freepokertracker.com",
+        "logo": "https://freepokertracker.com/pokericon.png"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is this poker tracker really free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Record sessions, manage your bankroll, and review performance with no subscription or hidden fees."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is this better than a spreadsheet?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "It is built only for poker: fewer steps, no formula maintenance, and views that match how players think about results."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I track multiple sites?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Online and live sessions live in one ledger so you always see the full picture."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What can I track?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Wins, losses, profit, hourly rate, duration, and bankroll trajectory — the essentials for serious study."
+            }
+          }
+        ]
       }
     </script>
     <script src="https://apis.google.com/js/api.js"></script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <main>
+        <h1>Free Poker Tracker — bankroll &amp; session tracking</h1>
+        <p>
+          This app needs JavaScript. Enable it to log poker sessions, track profit and hourly rate, and use analytics and groups.
+        </p>
+      </main>
+    </noscript>
     <div id="root"></div>
   </body>
 </html>
