@@ -7,13 +7,37 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://freepokertracker.com/guides/track-poker-sessions-profit</loc>
+    <loc>https://freepokertracker.com/guides/track-poker-sessions-profit.html</loc>
     <lastmod>2026-03-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://freepokertracker.com/guides/poker-bankroll-management</loc>
+    <loc>https://freepokertracker.com/guides/poker-bankroll-management.html</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://freepokertracker.com/guides/poker-hourly-rate.html</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://freepokertracker.com/guides/spreadsheet-vs-poker-tracker.html</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://freepokertracker.com/guides/online-vs-live-poker-tracking.html</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://freepokertracker.com/guides/poker-tournament-tracking.html</loc>
     <lastmod>2026-03-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>

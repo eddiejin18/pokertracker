@@ -922,6 +922,35 @@ app.delete('/api/sessions/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Bulk delete sessions (same user only)
+app.post('/api/sessions/bulk-delete', authenticateToken, async (req, res) => {
+  try {
+    const raw = req.body?.ids;
+    if (!Array.isArray(raw) || raw.length === 0) {
+      return res.status(400).json({ error: 'ids must be a non-empty array' });
+    }
+    const ids = raw
+      .map((id) => parseInt(id, 10))
+      .filter((id) => !Number.isNaN(id));
+    if (ids.length === 0) {
+      return res.status(400).json({ error: 'No valid integer ids' });
+    }
+    const result = await pool.query(
+      `DELETE FROM poker_sessions
+       WHERE user_id = $1 AND id = ANY($2::int[])
+       RETURNING id`,
+      [req.user.userId, ids]
+    );
+    res.json({
+      deleted: result.rows.length,
+      ids: result.rows.map((r) => r.id),
+    });
+  } catch (error) {
+    console.error('Bulk delete sessions error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Initialize database on startup
 initDatabase();
 

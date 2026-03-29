@@ -13,7 +13,6 @@ Allow: /online-poker-tracker
 Allow: /poker-tracker-download
 Allow: /poker-tracker-pt4
 Allow: /poker-tracker-free
-Allow: /guides/track-poker-sessions-profit
-Allow: /guides/poker-bankroll-management
+Allow: /guides/
 
 Sitemap: https://freepokertracker.com/sitemap.xml

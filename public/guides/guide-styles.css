@@ -1,0 +1,84 @@
+/* Shared minimal styles for static SEO guide pages — DM Sans, mist background */
+body {
+  margin: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #fafafa;
+  color: #1a1a1a;
+  line-height: 1.65;
+}
+.guide-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+.guide-wrap a {
+  color: #1a1a1a;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.guide-wrap a:hover {
+  opacity: 0.85;
+}
+.guide-back {
+  font-size: 0.8125rem;
+  margin-bottom: 2rem;
+  display: inline-block;
+}
+.guide-wrap h1 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+.guide-lead {
+  font-size: 1.125rem;
+  color: #525252;
+  margin: 0 0 2rem;
+}
+.guide-article {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.guide-article h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.75rem;
+}
+.guide-article h2:first-of-type {
+  margin-top: 0;
+}
+.guide-article p,
+.guide-article li {
+  font-size: 0.9375rem;
+  color: #404040;
+}
+.guide-article ul {
+  padding-left: 1.25rem;
+}
+.guide-article li {
+  margin: 0.5rem 0;
+}
+.guide-related {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e5e5;
+}
+.guide-related h2 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #737373;
+  margin: 0 0 1rem;
+}
+.guide-related ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.guide-related li {
+  margin: 0.5rem 0;
+}

@@ -71,6 +71,22 @@
       "dest": "/build/guides/poker-bankroll-management.html"
     },
     {
+      "src": "/guides/poker-hourly-rate",
+      "dest": "/build/guides/poker-hourly-rate.html"
+    },
+    {
+      "src": "/guides/spreadsheet-vs-poker-tracker",
+      "dest": "/build/guides/spreadsheet-vs-poker-tracker.html"
+    },
+    {
+      "src": "/guides/online-vs-live-poker-tracking",
+      "dest": "/build/guides/online-vs-live-poker-tracking.html"
+    },
+    {
+      "src": "/guides/poker-tournament-tracking",
+      "dest": "/build/guides/poker-tournament-tracking.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/build/$1"
     }

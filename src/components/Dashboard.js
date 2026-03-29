@@ -1,18 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { LogOut, TrendingUp, TrendingDown, Home, Plus, Users } from 'lucide-react';
+import { LogOut, TrendingUp, TrendingDown, Home, Plus, Users, FileSpreadsheet } from 'lucide-react';
 import ApiService from '../services/api';
 import SessionList from './SessionList';
 import SessionPanel from './SessionPanel';
 import LoadingPercentScreen from './LoadingPercentScreen';
 import SupportModal from './SupportModal';
 import GroupsView from './GroupsView';
+import SessionCsvImportModal from './SessionCsvImportModal';
+import { isCsvLikeFile } from '../utils/csvSessionImport';
 
 const Dashboard = ({ user, onSignOut, initialGroupId }) => {
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1M');
   const [recentSessions, setRecentSessions] = useState([]);
+  /** Total sessions from API before filters — used for empty-state copy */
+  const [totalSessionCountUnfiltered, setTotalSessionCountUnfiltered] = useState(0);
+  const [firstSessionHintDismissed, setFirstSessionHintDismissed] = useState(false);
   const [gameTypeData, setGameTypeData] = useState([]);
   const [locationData, setLocationData] = useState([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -24,6 +29,9 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
   const [editingSession, setEditingSession] = useState(null);
   const [blindsOptions, setBlindsOptions] = useState([]);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [isCsvImportOpen, setIsCsvImportOpen] = useState(false);
+  const [csvPendingFile, setCsvPendingFile] = useState(null);
+  const [recentSessionsDropActive, setRecentSessionsDropActive] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [newSessionSeedDate, setNewSessionSeedDate] = useState(null);
   const defaultFilters = {
@@ -40,6 +48,11 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
   useEffect(() => {
     if (initialGroupId) setActiveTab('groups');
   }, [initialGroupId]);
+
+  /** Show first-session hint again on each login / account switch (no sessionStorage — that hid it after logout). */
+  useEffect(() => {
+    setFirstSessionHintDismissed(false);
+  }, [user?.id]);
 
   useEffect(() => {
     loadData();
@@ -76,6 +89,7 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
       setError(null);
       
       let sessions = await ApiService.getSessions();
+      setTotalSessionCountUnfiltered(sessions.length);
 
       // Populate blinds options from all sessions
       const uniqueBlinds = Array.from(new Set(sessions.map(s => s.blinds).filter(Boolean)));
@@ -328,6 +342,50 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
     setIsEditPanelOpen(true);
   };
 
+  const dismissFirstSessionHint = () => {
+    setFirstSessionHintDismissed(true);
+  };
+
+  const showFirstSessionHint =
+    totalSessionCountUnfiltered === 0 && !firstSessionHintDismissed;
+
+  const handleCsvInitialFileConsumed = useCallback(() => setCsvPendingFile(null), []);
+
+  const handleRecentSessionsDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const types = e.dataTransfer?.types;
+    if (types && !Array.from(types).includes('Files')) return;
+    setRecentSessionsDropActive(true);
+  };
+
+  const handleRecentSessionsDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const { clientX: x, clientY: y } = e;
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+      setRecentSessionsDropActive(false);
+    }
+  };
+
+  const handleRecentSessionsDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleRecentSessionsDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setRecentSessionsDropActive(false);
+    const f = Array.from(e.dataTransfer.files || []).find(isCsvLikeFile);
+    if (f) {
+      setCsvPendingFile(f);
+      setIsCsvImportOpen(true);
+    }
+  };
+
   const handleEditSession = (session) => {
     setEditingSession(session);
     setNewSessionSeedDate(null);
@@ -443,11 +501,26 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
         ) : (
         <>
             <div className="mb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-              <div>
+              <div className="min-w-0 flex-1">
                 <h1 className="text-xl font-bold text-neutral-900 tracking-tight">Overview</h1>
-                <p className="text-[13px] text-gray-500 mt-0.5">Performance and session history</p>
+                <div className="mt-0.5 flex flex-row flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                  <p className="text-[13px] text-gray-500 min-w-0">Performance and session history</p>
+                  <p className="text-[12px] text-gray-400 text-right leading-snug shrink-0 max-w-[min(100%,22rem)]">
+                    Feedback welcome — use{' '}
+                    <button
+                      type="button"
+                      onClick={() => setIsSupportOpen(true)}
+                      className="font-medium text-gray-500 hover:text-charcoal underline decoration-gray-300/70 underline-offset-2 transition-colors"
+                    >
+                      Support
+                    </button>
+                    {' '}
+                    anytime.
+                  </p>
+                </div>
               </div>
             </div>
+
             {/* Filters — collapsible to save vertical space */}
             <div className="mb-4 rounded-xl border border-gray-100 bg-white p-3 sm:p-4 shadow-soft">
             <div className="flex items-center justify-between gap-2">
@@ -636,8 +709,18 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
           </div>
         )}
 
-        {/* Recent sessions — transaction rows (bottom of Overview) */}
-        <div className="mt-4 rounded-xl border border-gray-100 bg-white p-4 sm:p-5 shadow-soft">
+        {/* Recent sessions — transaction rows (bottom of Overview); drop CSV to import */}
+        <div
+          className={`mt-4 rounded-xl border bg-white p-4 sm:p-5 shadow-soft transition-colors ${
+            recentSessionsDropActive ? 'border-sky-400 ring-2 ring-sky-200/70' : 'border-gray-100'
+          }`}
+          onDragEnter={handleRecentSessionsDragEnter}
+          onDragLeave={handleRecentSessionsDragLeave}
+          onDragOver={handleRecentSessionsDragOver}
+          onDrop={handleRecentSessionsDrop}
+          role="region"
+          aria-label="Recent sessions. Drop a CSV file here to import."
+        >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
               <h2 className="text-[14px] font-semibold text-neutral-900 tracking-tight">Recent sessions</h2>
@@ -645,15 +728,58 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
                 Newest first · {recentSessions.length} session{recentSessions.length !== 1 ? 's' : ''}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleAddSession}
-              className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 bg-white text-charcoal shadow-sm hover:bg-gray-50 transition-colors shrink-0"
-              title="Add session"
-              aria-label="Add session"
-            >
-              <Plus className="h-4 w-4" strokeWidth={2} />
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setCsvPendingFile(null);
+                  setIsCsvImportOpen(true);
+                }}
+                className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 bg-white text-charcoal shadow-sm hover:bg-gray-50 transition-colors"
+                title="Import sessions from CSV"
+                aria-label="Import sessions from CSV"
+              >
+                <FileSpreadsheet className="h-4 w-4" strokeWidth={2} />
+              </button>
+              <div className="relative">
+              {showFirstSessionHint && (
+                <div
+                  id="empty-account-sessions-hint"
+                  role="tooltip"
+                  className="absolute bottom-full right-0 z-20 mb-2 w-[min(100vw-2rem,220px)] rounded-lg border border-gray-200/90 bg-white py-2 pl-2.5 pr-7 text-left shadow-md shadow-black/[0.06]"
+                >
+                  <p id="empty-account-hint-desc" className="text-[12px] leading-snug text-gray-600">
+                    Tap <span className="font-semibold text-gray-800">+</span> to add your first session
+                  </p>
+                  <button
+                    type="button"
+                    onClick={dismissFirstSessionHint}
+                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-md text-[15px] leading-none text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    aria-label="Dismiss hint"
+                  >
+                    ×
+                  </button>
+                  <div
+                    className="absolute -bottom-1 right-3 h-2 w-2 rotate-45 border-b border-r border-gray-200/90 bg-white"
+                    aria-hidden
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                id="dashboard-add-session-btn"
+                onClick={handleAddSession}
+                aria-describedby={showFirstSessionHint ? 'empty-account-hint-desc' : undefined}
+                className={`inline-flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 bg-white text-charcoal shadow-sm hover:bg-gray-50 transition-colors ${
+                  showFirstSessionHint ? 'ring-2 ring-sky-200/80 ring-offset-1' : ''
+                }`}
+                title="Add session"
+                aria-label="Add session"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2} />
+              </button>
+              </div>
+            </div>
           </div>
           <div
             className="overflow-x-auto -mx-1 px-1"
@@ -669,6 +795,8 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
               onSessionUpdated={loadData}
               onEditSession={handleEditSession}
               variant="table"
+              noSessionsOnAccount={totalSessionCountUnfiltered === 0}
+              enableBulkDelete
             />
           </div>
         </div>
@@ -691,6 +819,17 @@ const Dashboard = ({ user, onSignOut, initialGroupId }) => {
 
       {/* Support Modal */}
       <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
+
+      <SessionCsvImportModal
+        isOpen={isCsvImportOpen}
+        onClose={() => {
+          setIsCsvImportOpen(false);
+          setCsvPendingFile(null);
+        }}
+        onImported={loadData}
+        initialFile={csvPendingFile}
+        onInitialFileConsumed={handleCsvInitialFileConsumed}
+      />
     </div>
   );
 };

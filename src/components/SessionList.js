@@ -1,13 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, DollarSign, Trash2, Edit3 } from 'lucide-react';
 import ApiService from '../services/api';
 import { formatSessionLocationLine } from '../utils/sessionLocation';
 
-const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'default' }) => {
+const SessionList = ({
+  sessions,
+  onSessionUpdated,
+  onEditSession,
+  variant = 'default',
+  /** When true and list is empty, user has no sessions at all (not just filtered out). */
+  noSessionsOnAccount = false,
+  /** Table only: checkboxes + bulk delete */
+  enableBulkDelete = false,
+}) => {
   const clean = variant === 'clean';
   const table = variant === 'table';
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [expandedNotes, setExpandedNotes] = useState({});
+
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const valid = new Set(sessions.map((s) => s.id));
+      const next = new Set();
+      prev.forEach((id) => {
+        if (valid.has(id)) next.add(id);
+      });
+      return next;
+    });
+  }, [sessions]);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -38,6 +60,33 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
     } catch (error) {
       console.error('Error deleting session:', error);
       alert('Failed to delete session');
+    }
+  };
+
+  const toggleRowSelect = (sessionId) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(sessionId)) next.delete(sessionId);
+      else next.add(sessionId);
+      return next;
+    });
+  };
+
+  const toggleSelectAllRows = () => {
+    if (!sessions.length) return;
+    const allOn = sessions.every((s) => selectedIds.has(s.id));
+    setSelectedIds(allOn ? new Set() : new Set(sessions.map((s) => s.id)));
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await ApiService.deleteSessionsBulk(Array.from(selectedIds));
+      setSelectedIds(new Set());
+      setBulkDeletePending(false);
+      onSessionUpdated();
+    } catch (error) {
+      console.error('Bulk delete error:', error);
+      alert(error?.message || 'Failed to delete sessions');
     }
   };
 
@@ -75,11 +124,24 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
   };
 
   if (sessions.length === 0) {
+    if (noSessionsOnAccount) {
+      return (
+        <div className="text-center py-8 px-2">
+          <Calendar className="h-10 w-10 text-gray-200 mx-auto mb-3" strokeWidth={1.25} />
+          <p className="text-[14px] text-gray-500">No sessions yet</p>
+          <p className="text-[13px] text-gray-400 mt-1 max-w-sm mx-auto">
+            Sessions you add will appear here.
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="text-center py-12">
         <Calendar className="h-10 w-10 text-gray-200 mx-auto mb-3" strokeWidth={1.25} />
-        <p className="text-[14px] text-gray-500">No sessions yet</p>
-        <p className="text-[13px] text-gray-400 mt-1">Add your first session to get started</p>
+        <p className="text-[14px] text-gray-500">No sessions match your filters</p>
+        <p className="text-[13px] text-gray-400 mt-1 max-w-xs mx-auto">
+          Clear filters or widen the date range to see sessions.
+        </p>
       </div>
     );
   }
@@ -87,10 +149,33 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
   if (table) {
     return (
       <>
+        {enableBulkDelete && selectedIds.size > 0 && (
+          <div className="flex justify-end mb-2">
+            <button
+              type="button"
+              onClick={() => setBulkDeletePending(true)}
+              className="text-[12px] font-medium text-red-600 hover:text-red-700 px-2 py-1 rounded-md hover:bg-red-50"
+            >
+              Delete {selectedIds.size} selected
+            </button>
+          </div>
+        )}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] border-collapse text-left">
+          <table className={`w-full border-collapse text-left ${enableBulkDelete ? 'min-w-[780px]' : 'min-w-[720px]'}`}>
             <thead>
               <tr className="border-b border-gray-100">
+                {enableBulkDelete && (
+                  <th className="pb-3 pr-2 w-10 text-[11px] font-medium uppercase tracking-wider text-gray-500">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      checked={sessions.length > 0 && sessions.every((s) => selectedIds.has(s.id))}
+                      onChange={toggleSelectAllRows}
+                      title="Select all"
+                      aria-label="Select all sessions"
+                    />
+                  </th>
+                )}
                 <th className="pb-3 pr-4 text-[11px] font-medium uppercase tracking-wider text-gray-500">Date</th>
                 <th className="pb-3 pr-4 text-[11px] font-medium uppercase tracking-wider text-gray-500">Game</th>
                 <th className="pb-3 pr-4 text-[11px] font-medium uppercase tracking-wider text-gray-500">Stakes</th>
@@ -105,6 +190,17 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
             <tbody>
               {sessions.map((session) => (
                 <tr key={session.id} className="border-b border-gray-100 last:border-0">
+                  {enableBulkDelete && (
+                    <td className="py-4 pr-2 align-middle">
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300"
+                        checked={selectedIds.has(session.id)}
+                        onChange={() => toggleRowSelect(session.id)}
+                        aria-label={`Select session ${session.id}`}
+                      />
+                    </td>
+                  )}
                   <td className="py-4 pr-4 align-middle text-[14px] text-neutral-900 whitespace-nowrap">
                     {formatDate(session.timestamp)}
                   </td>
@@ -152,8 +248,17 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
         </div>
 
         {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
-            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
+            onMouseDown={() => setShowDeleteConfirm(null)}
+            role="presentation"
+          >
+            <div
+              className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full"
+              onMouseDown={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
               <h3 className="text-lg font-semibold text-charcoal mb-2">Delete session</h3>
               <p className="text-gray-500 text-[14px] mb-6">Are you sure? This cannot be undone.</p>
               <div className="flex gap-3">
@@ -170,6 +275,40 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
                   className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-[14px] font-medium"
                 >
                   Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {bulkDeletePending && (
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
+            onMouseDown={() => setBulkDeletePending(false)}
+            role="presentation"
+          >
+            <div
+              className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full"
+              onMouseDown={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Delete {selectedIds.size} sessions</h3>
+              <p className="text-gray-500 text-[14px] mb-6">This cannot be undone.</p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setBulkDeletePending(false)}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 text-charcoal rounded-lg hover:bg-gray-50 transition-colors text-[14px] font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkDelete}
+                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-[14px] font-medium"
+                >
+                  Delete all
                 </button>
               </div>
             </div>
@@ -243,8 +382,17 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
           );
         })}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
-            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
+            onMouseDown={() => setShowDeleteConfirm(null)}
+            role="presentation"
+          >
+            <div
+              className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full"
+              onMouseDown={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
               <h3 className="text-lg font-semibold text-charcoal mb-2">Delete session</h3>
               <p className="text-[14px] text-gray-500 mb-6">This cannot be undone.</p>
               <div className="flex gap-3">
@@ -347,8 +495,17 @@ const SessionList = ({ sessions, onSessionUpdated, onEditSession, variant = 'def
       
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg border border-black max-w-md w-full mx-4">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onMouseDown={() => setShowDeleteConfirm(null)}
+          role="presentation"
+        >
+          <div
+            className="bg-white p-6 rounded-lg border border-black max-w-md w-full mx-4"
+            onMouseDown={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <h3 className="text-lg font-semibold text-black mb-4">Delete Session</h3>
             <p className="text-gray-600 mb-6">Are you sure you want to delete this session? This action cannot be undone.</p>
             <div className="flex space-x-3">

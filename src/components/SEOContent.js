@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 const HOME_SEO = {
   title: 'Free Poker Tracker & Bankroll Tracker | Live & Online Sessions',
   description:
-    'Free poker tracker and bankroll tracker: log live and online sessions, profit, hourly rate, charts, and friend groups. No subscription.',
+    'Free poker tracker & bankroll app: log live & online poker sessions, profit, hourly rate, charts, groups & leaderboards. Guides on bankroll, tournaments & tracking. No subscription.',
   keywords:
-    'free poker tracker, poker bankroll tracker, poker session tracker, track poker winnings, poker profit tracker, online poker tracker, live poker tracker, poker analytics',
+    'free poker tracker, poker bankroll tracker, poker session tracker, track poker winnings, poker profit tracker, online poker tracker, live poker tracker, poker analytics, poker hourly rate, poker tournament tracking',
 };
 
 const ABSOLUTE_ORIGIN = 'https://freepokertracker.com';

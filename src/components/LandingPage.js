@@ -18,6 +18,39 @@ const navItems = [
   { id: 'section-groups', label: 'Groups', icon: Users },
 ];
 
+const SEO_GUIDE_LINKS = [
+  {
+    href: '/guides/track-poker-sessions-profit.html',
+    title: 'Track sessions & profit',
+    blurb: 'What to log, profit, hourly rate, and groups.',
+  },
+  {
+    href: '/guides/poker-bankroll-management.html',
+    title: 'Bankroll basics',
+    blurb: 'Separate bankroll, risk, and long-term trends.',
+  },
+  {
+    href: '/guides/poker-hourly-rate.html',
+    title: 'Hourly rate explained',
+    blurb: 'Formula, variance, and why averages help.',
+  },
+  {
+    href: '/guides/spreadsheet-vs-poker-tracker.html',
+    title: 'Spreadsheet vs tracker',
+    blurb: 'When Excel works and when software fits.',
+  },
+  {
+    href: '/guides/online-vs-live-poker-tracking.html',
+    title: 'Online vs live tracking',
+    blurb: 'One ledger for sites, casinos, and home games.',
+  },
+  {
+    href: '/guides/poker-tournament-tracking.html',
+    title: 'Tournament tracking',
+    blurb: 'MTT & SNG buy-ins, cashes, and duration.',
+  },
+];
+
 const LandingPage = ({ onGetStarted }) => {
   const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('section-sessions');
@@ -528,6 +561,39 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
       </section>
 
+      {/* Guides — crawlable text + internal links */}
+      <section
+        id="section-guides"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24 border-t border-gray-100"
+      >
+        <div className="max-w-2xl mb-12 lg:mb-14">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 mb-4">Guides &amp; resources</p>
+          <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-charcoal leading-[1.15] mb-6">
+            Learn poker tracking — without the noise
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed font-normal">
+            Practical articles on session logging, bankroll, hourly rate, tournaments, and how a dedicated tracker compares to spreadsheets. Written for players who want
+            accurate history and clearer decisions.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          {SEO_GUIDE_LINKS.map(({ href, title, blurb }) => (
+            <a
+              key={href}
+              href={href}
+              className="group rounded-2xl border border-gray-100 bg-white/80 backdrop-blur-sm p-6 lg:p-7 transition-shadow duration-300 hover:shadow-luxury-sm hover:border-gray-200"
+            >
+              <h3 className="text-[15px] font-semibold tracking-tight text-charcoal mb-2 group-hover:text-charcoal">{title}</h3>
+              <p className="text-[14px] leading-relaxed text-gray-600 font-normal">{blurb}</p>
+              <span className="inline-flex items-center gap-1 mt-4 text-[13px] font-medium text-charcoal">
+                Read
+                <ArrowRight className="h-3.5 w-3.5 opacity-70" strokeWidth={2} />
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* FAQ */}
       <section id="section-faq" className="max-w-3xl mx-auto px-6 lg:px-10 py-20 lg:py-28 scroll-mt-24">
         <div className="text-center mb-14">
@@ -551,6 +617,30 @@ const LandingPage = ({ onGetStarted }) => {
             {
               q: 'What can I track?',
               a: 'Wins, losses, profit, hourly rate, duration, and bankroll trajectory — the essentials for serious study.',
+            },
+            {
+              q: 'What is hourly rate in poker and why does it matter?',
+              a: 'Hourly rate is profit divided by hours played. It smooths out luck in single sessions and helps you review performance over many games — something a good tracker calculates for you.',
+            },
+            {
+              q: 'Can I track live and online poker together?',
+              a: 'Yes. Label sessions by location type (home, casino, or online) so filters and charts stay meaningful while your bankroll stays in one place.',
+            },
+            {
+              q: 'Does this work for tournaments or only cash games?',
+              a: 'You can log tournaments with buy-ins and payouts alongside cash sessions. Net profit and duration still drive your bankroll and hourly figures.',
+            },
+            {
+              q: 'How do groups and leaderboards work?',
+              a: 'Create a group, invite friends, and see rankings by metrics like total profit and hourly rate. Moderators can filter which sessions count (e.g. online only).',
+            },
+            {
+              q: 'Do I need to install desktop software?',
+              a: 'No. The product runs in your web browser on desktop and mobile — sign up and start logging sessions without a separate install.',
+            },
+            {
+              q: 'Is my data tied to my account?',
+              a: 'Your session history is stored with your login so you can access it from any device where you sign in.',
             },
           ].map(({ q, a }) => (
             <div key={q} className="px-6 py-8 lg:px-8">
@@ -618,10 +708,7 @@ const LandingPage = ({ onGetStarted }) => {
               },
               {
                 title: 'Guides',
-                links: [
-                  { label: 'Track sessions & profit', href: '/guides/track-poker-sessions-profit' },
-                  { label: 'Bankroll basics', href: '/guides/poker-bankroll-management' },
-                ],
+                links: SEO_GUIDE_LINKS.map(({ href, title }) => ({ label: title, href })),
               },
               {
                 title: 'Support',

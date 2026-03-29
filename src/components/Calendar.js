@@ -380,8 +380,17 @@ const Calendar = ({ onSessionAdded }) => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full">
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
+          onMouseDown={() => setShowDeleteConfirm(null)}
+          role="presentation"
+        >
+          <div
+            className="bg-white p-6 rounded-xl border border-gray-100 shadow-luxury max-w-md w-full"
+            onMouseDown={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <h3 className="text-lg font-semibold text-charcoal mb-2">Delete session</h3>
             <p className="text-gray-500 text-[14px] mb-6">Are you sure? This cannot be undone.</p>
             <div className="flex gap-3">

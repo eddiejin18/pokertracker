@@ -180,6 +180,13 @@ class ApiService {
     });
   }
 
+  async deleteSessionsBulk(ids) {
+    return this.request('/sessions/bulk-delete', {
+      method: 'POST',
+      body: JSON.stringify({ ids }),
+    });
+  }
+
   async sendSupport(subject, message) {
     return this.request('/support', {
       method: 'POST',
