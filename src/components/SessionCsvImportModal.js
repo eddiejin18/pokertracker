@@ -306,19 +306,25 @@ const SessionCsvImportModal = ({ isOpen, onClose, onImported, initialFile = null
             <p>
               <span className="font-medium text-gray-800">Required</span> for each row to import as a session:{' '}
               <span className="text-gray-700">
-                blinds, location type, location, date, buy in, end amount, duration
+                blinds, location type, date, buy in, end amount, duration
               </span>
-              .
+              . <span className="text-gray-600">Location is optional.</span>
             </p>
             <ul className="list-disc pl-5 text-[12px] text-gray-600 space-y-1">
+              <li>
+                <span className="font-medium text-gray-800">Blinds</span> — two numbers in the form{' '}
+                <span className="font-mono text-gray-700">#/#</span> (e.g.{' '}
+                <span className="font-mono text-gray-700">0.25/0.50</span>,{' '}
+                <span className="font-mono text-gray-700">0.0002/5</span>); dollar signs are optional.
+              </li>
               <li>
                 <span className="font-medium text-gray-800">Location type</span> —{' '}
                 <span className="text-gray-700">online</span>, <span className="text-gray-700">casino</span>, or{' '}
                 <span className="text-gray-700">home</span>.
               </li>
               <li>
-                <span className="font-medium text-gray-800">Location</span> — online room or site (e.g. PokerStars,
-                GGPoker), casino name (e.g. Bellagio), or home-game label.
+                <span className="font-medium text-gray-800">Location</span> — optional. When present: online room or
+                site (e.g. PokerStars), casino name (e.g. Bellagio), or a home-game label. Leave blank if you prefer.
               </li>
             </ul>
             <p className="text-[12px] text-gray-500 pt-0.5">

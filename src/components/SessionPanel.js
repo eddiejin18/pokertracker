@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, DollarSign, MapPin, Calendar, Clock, Gamepad2, FileText } from 'lucide-react';
 import ApiService from '../services/api';
+import { normalizeBlindsInput, BLINDS_INVALID_MESSAGE } from '../utils/blindsFormat';
 
 const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSession }) => {
   const formatLocalDate = (d) => {
@@ -60,31 +61,6 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
     '2-7 Triple Draw',
     'Badugi',
     'Mixed Games'
-  ];
-
-  const commonBlinds = [
-    '$0.25/$0.50',
-    '$0.50/$1',
-    '$1/$2',
-    '$1/$3',
-    '$2/$5',
-    '$3/$6',
-    '$5/$10',
-    '$10/$20',
-    '$25/$50',
-    '$50/$100',
-    '$100/$200'
-  ];
-
-  const tournamentBuyIns = [
-    '$5',
-    '$10',
-    '$20',
-    '$50',
-    '$100',
-    '$200',
-    '$500',
-    '$1000'
   ];
 
   // Comprehensive casino database by major cities
@@ -398,9 +374,10 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
         ? new Date(editingSession.timestamp).toISOString().split('T')[0]
         : editingSession.timestamp;
       
+      const rawBlinds = editingSession.blinds || '';
       setFormData({
         gameType: editingSession.game_type || 'No Limit Hold\'em',
-        blinds: editingSession.blinds || '',
+        blinds: normalizeBlindsInput(rawBlinds) || rawBlinds,
         location:
           editingSession.location_type === 'home' || editingSession.location_type === 'online'
             ? editingSession.location || ''
@@ -503,6 +480,11 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const blindsNormalized = normalizeBlindsInput(formData.blinds);
+    if (!blindsNormalized) {
+      alert(BLINDS_INVALID_MESSAGE);
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -511,7 +493,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
       const normalizedTimestamp = dateOnly ? `${dateOnly}T12:00:00` : new Date().toISOString().split('T')[0] + 'T12:00:00';
       const sessionData = {
         gameType: formData.gameType,
-        blinds: formData.blinds,
+        blinds: blindsNormalized,
         location:
           formData.locationType === 'casino' ? formData.casinoName : formData.location,
         locationType: formData.locationType,
@@ -638,35 +620,21 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
             {/* Blinds/Stakes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Blinds/Stakes
+                Blinds/Stakes <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <select
-                  name="blinds"
-                  value={formData.blinds}
-                  onChange={handleInputChange}
-                  className="w-full appearance-none pl-3 pr-11 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900"
-                >
-                  <option value="">Select blinds</option>
-                  {commonBlinds.map(blind => (
-                    <option key={blind} value={blind}>{blind}</option>
-                  ))}
-                </select>
-                <svg
-                  className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </div>
+              <input
+                type="text"
+                name="blinds"
+                value={formData.blinds}
+                onChange={handleInputChange}
+                placeholder="0.25/0.50"
+                autoComplete="off"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-gray-500 bg-white text-gray-900 placeholder-gray-400"
+              />
+              <p className="text-xs text-gray-500 mt-1.5">
+                Required format: two numbers separated by a slash (e.g. <span className="font-mono">0.25/0.50</span>,{' '}
+                <span className="font-mono">0.0002/5</span>). Dollar signs are optional.
+              </p>
             </div>
           </div>
 
@@ -717,10 +685,10 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {formData.locationType === 'casino'
-                ? 'Casino Name'
+                ? 'Casino name (optional)'
                 : formData.locationType === 'online'
-                  ? 'Site / platform'
-                  : 'Location'}
+                  ? 'Site / platform (optional)'
+                  : 'Location (optional)'}
             </label>
             {formData.locationType === 'casino' ? (
               <div className="relative">

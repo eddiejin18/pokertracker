@@ -22,6 +22,20 @@ const pool = new Pool({
   ssl: needsSSL ? { rejectUnauthorized: false } : false,
 });
 
+/** Keep in sync with src/utils/blindsFormat.js */
+function normalizeBlindsInput(raw) {
+  if (raw == null) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  const parts = s.split('/');
+  if (parts.length !== 2) return null;
+  const numRe = /^\d+(?:\.\d+)?$/;
+  const left = parts[0].replace(/[$€£\s,]/g, '').trim();
+  const right = parts[1].replace(/[$€£\s,]/g, '').trim();
+  if (!numRe.test(left) || !numRe.test(right)) return null;
+  return `${left}/${right}`;
+}
+
 // Do not initialize Resend at module load to avoid throwing when key is missing
 
 // Middleware
@@ -848,12 +862,20 @@ app.post('/api/sessions', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'timestamp (YYYY-MM-DD or ISO) is required' });
     }
 
+    const blindsNormalized = normalizeBlindsInput(blinds);
+    if (!blindsNormalized) {
+      return res.status(400).json({
+        error:
+          'blinds (stakes) is required and must be two numbers in the form #/# (e.g. 0.25/0.50)',
+      });
+    }
+
     const result = await pool.query(
       `INSERT INTO poker_sessions 
        (user_id, game_type, blinds, location, location_type, buy_in, end_amount, winnings, duration, notes, timestamp)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::timestamp)
        RETURNING *`,
-      [req.user.userId, gameType, blinds, location, locationType, buyIn, endAmount, winnings, duration, notes, ts]
+      [req.user.userId, gameType, blindsNormalized, location ?? '', locationType, buyIn, endAmount, winnings, duration, notes, ts]
     );
 
     res.status(201).json(result.rows[0]);
@@ -881,13 +903,21 @@ app.put('/api/sessions/:id', authenticateToken, async (req, res) => {
 
     const winnings = endAmount - buyIn;
 
+    const blindsNormalized = normalizeBlindsInput(blinds);
+    if (!blindsNormalized) {
+      return res.status(400).json({
+        error:
+          'blinds (stakes) is required and must be two numbers in the form #/# (e.g. 0.25/0.50)',
+      });
+    }
+
     const result = await pool.query(
       `UPDATE poker_sessions 
        SET game_type = $1, blinds = $2, location = $3, location_type = $4, 
            buy_in = $5, end_amount = $6, winnings = $7, duration = $8, notes = $9, timestamp = $10
        WHERE id = $11 AND user_id = $12
        RETURNING *`,
-      [gameType, blinds, location, locationType, buyIn, endAmount, winnings, duration, notes, timestamp, id, req.user.userId]
+      [gameType, blindsNormalized, location ?? '', locationType, buyIn, endAmount, winnings, duration, notes, timestamp, id, req.user.userId]
     );
 
     if (result.rows.length === 0) {

@@ -2,6 +2,8 @@
  * CSV parsing + column inference for poker session import.
  */
 
+import { normalizeBlindsInput, BLINDS_INVALID_MESSAGE } from './blindsFormat';
+
 export const DEFAULT_GAME_TYPE = "No Limit Hold'em";
 
 const FIELD_ALIASES = {
@@ -222,25 +224,22 @@ export function buildLocationField(p) {
  */
 export function validateAndBuildSession(rowByField) {
   const errors = [];
-  const blinds = (rowByField.blinds || '').trim();
+  const blindsRaw = (rowByField.blinds || '').trim();
+  const blindsNormalized = normalizeBlindsInput(blindsRaw);
   const ltRaw = rowByField.locationType;
   const locationType = normalizeLocationType(ltRaw);
-  let location = buildLocationField({
+  const location = buildLocationField({
     location: rowByField.location,
     site: rowByField.site,
   });
-  if (!location && locationType === 'home') {
-    location = 'Home';
-  }
   const dateRaw = rowByField.date;
   const buyIn = parseMoney(rowByField.buyIn);
   const endAmount = parseMoney(rowByField.endAmount);
   const duration = parseDurationHours(rowByField.duration);
   const ts = parseDateToTimestamp(dateRaw);
 
-  if (!blinds) errors.push('Missing blinds');
+  if (!blindsNormalized) errors.push(blindsRaw ? BLINDS_INVALID_MESSAGE : 'Missing blinds');
   if (!locationType) errors.push('Invalid or missing location type (use online, casino, or home)');
-  if (!location) errors.push('Missing location');
   if (!ts) errors.push('Invalid or missing date');
   if (!Number.isFinite(buyIn)) errors.push('Invalid buy in');
   if (!Number.isFinite(endAmount)) errors.push('Invalid end amount');
@@ -259,7 +258,7 @@ export function validateAndBuildSession(rowByField) {
     errors: [],
     payload: {
       gameType,
-      blinds,
+      blinds: blindsNormalized,
       location,
       locationType,
       buyIn,
