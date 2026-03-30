@@ -3,7 +3,12 @@
  * Accepts optional $ and whitespace; normalizes to plain numbers.
  */
 
-const NUM_PART = /^\d+(?:\.\d+)?$/;
+const NUM_PART = /^(?:\d+(?:\.\d+)?|\.\d+)$/;
+
+function normalizeNumberPart(part) {
+  if (part.startsWith('.')) return `0${part}`;
+  return part;
+}
 
 /**
  * @param {unknown} raw
@@ -18,7 +23,7 @@ export function normalizeBlindsInput(raw) {
   const left = parts[0].replace(/[$€£\s,]/g, '').trim();
   const right = parts[1].replace(/[$€£\s,]/g, '').trim();
   if (!NUM_PART.test(left) || !NUM_PART.test(right)) return null;
-  return `${left}/${right}`;
+  return `${normalizeNumberPart(left)}/${normalizeNumberPart(right)}`;
 }
 
 export const BLINDS_INVALID_MESSAGE =
