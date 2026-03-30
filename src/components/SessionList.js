@@ -215,13 +215,23 @@ const SessionList = ({
                     {formatDuration(session.duration || 0)}
                   </td>
                   <td className="py-4 pr-6 align-middle text-right">
+                    {(() => {
+                      const w =
+                        (typeof session.winnings === 'number'
+                          ? session.winnings
+                          : parseFloat(session.winnings)) || 0;
+                      const positive = w >= 0;
+                      return (
                     <span
                       className={`text-[14px] font-semibold tabular-nums ${
-                        (session.winnings || 0) >= 0 ? 'text-neutral-900' : 'text-red-600'
+                        positive ? 'text-emerald-600' : 'text-red-600'
                       }`}
                     >
-                      {formatCurrency(session.winnings)}
+                      {positive ? '+' : ''}
+                      {formatCurrency(w)}
                     </span>
+                      );
+                    })()}
                   </td>
                   <td className="py-4 align-middle text-right whitespace-nowrap">
                     <button
