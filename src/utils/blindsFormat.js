@@ -22,4 +22,4 @@ export function normalizeBlindsInput(raw) {
 }
 
 export const BLINDS_INVALID_MESSAGE =
-  'Blinds/stakes must be two numbers in the form #/# (e.g. 0.25/0.50 or 0.0002/5). Dollar signs are optional.';
+  'Blinds/stakes must be two numbers in the form #/# (e.g. 0.25/0.50 or 0.0002/5).';

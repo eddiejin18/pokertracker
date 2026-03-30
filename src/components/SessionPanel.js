@@ -633,7 +633,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
               />
               <p className="text-xs text-gray-500 mt-1.5">
                 Required format: two numbers separated by a slash (e.g. <span className="font-mono">0.25/0.50</span>,{' '}
-                <span className="font-mono">0.0002/5</span>). Dollar signs are optional.
+                <span className="font-mono">0.0002/5</span>).
               </p>
             </div>
           </div>
