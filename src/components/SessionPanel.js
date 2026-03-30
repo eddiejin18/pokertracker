@@ -685,10 +685,10 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {formData.locationType === 'casino'
-                ? 'Casino name (optional)'
+                ? 'Casino name'
                 : formData.locationType === 'online'
-                  ? 'Site / platform (optional)'
-                  : 'Location (optional)'}
+                  ? 'Site / platform'
+                  : 'Location'}
             </label>
             {formData.locationType === 'casino' ? (
               <div className="relative">
@@ -790,7 +790,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <DollarSign className="h-4 w-4 inline mr-1" />
-                Buy-in Amount ($)
+                Buy-in Amount ($) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -807,7 +807,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
             {/* End Amount */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                End Amount ($)
+                End Amount ($) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -825,7 +825,7 @@ const SessionPanel = ({ isOpen, onClose, onSessionAdded, selectedDate, editingSe
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Clock className="h-4 w-4 inline mr-1" />
-                Duration (hours)
+                Duration (hours) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
